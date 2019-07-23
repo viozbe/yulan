@@ -82,12 +82,12 @@
                                 <span slot="title">任务查询</span>
                             </el-menu-item>
                         </router-link>
-                        <router-link to="/refundCompensation" tag="div">
+                        <!-- <router-link to="/refundCompensation" tag="div">
                             <el-menu-item index="refundCompensation">
                                 <i class="iconfont icon-color">&#xe6ee;</i>
                                 <span slot="title">退款赔偿</span>
                             </el-menu-item>
-                        </router-link>
+                        </router-link> -->
                         <el-submenu index="design">
                             <template slot="title"><i class="iconfont icon-color">&#xe7fb;</i><span>设计</span></template>
                             <el-menu-item-group>

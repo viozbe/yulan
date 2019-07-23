@@ -21,3 +21,7 @@ https://www.cnblogs.com/tjyoung/p/6832234.html
 		--文档：https://www.jianshu.com/p/6e1bacd35f59
 	elementUI：npm i element-ui -S
 		--官方文档：https://element.eleme.cn/#/zh-CN
+
+tip：
+	1.窗帘购物车组件放在src/components/shoppingCar/shoppingCurtain.vue中；涉及订单统一放在放在src/components/order文件夹中
+	2.npm run dev是本地运行的语句	npm run build是打包成能部署到服务器代码的语句，打包后生成的文件放在dist文件夹中
