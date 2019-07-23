@@ -32,4 +32,15 @@ export default {
 .el-scrollbar>div{
     margin-bottom: 0px !important;
 }
+.el-table__expand-icon--expanded{
+    -webkit-transform: none !important;
+    transform: none !important;
+}
+.el-table__expand-icon>.el-icon {
+    position: inherit;
+    left: 0%;
+    top: 0%;
+    margin-left: 0px;
+    margin-top: 0px;
+}
 </style>

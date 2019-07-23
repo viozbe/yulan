@@ -1,6 +1,8 @@
 <template>
     <div id="shopTabCon">
-        <el-table class="loading-area"
+        <el-table
+            id="shopTabTable"
+            class="loading-area"
             :data="tableData"
             :row-key="getRowKeys"
             :expand-row-keys="expands"
@@ -467,8 +469,8 @@ export default {
 #shopTabCon .el-dialog__body{
     padding: 0 20px;
 }
-#shopTabCon .el-table__expand-icon::after{
-    display: block;
+#shopTabTable .el-table__expand-icon::after{
+    display: block!important;
     position: relative;
     bottom: 1px;
     font-size: 14px;

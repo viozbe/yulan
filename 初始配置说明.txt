@@ -1,0 +1,23 @@
+运行此项目需要安装开发环境
+1.安装并配置node环境
+2.配置npm
+3.安装vue
+4.安装vue-router
+5.安装vue-cli
+6.安装依赖包
+参考链接：
+https://www.cnblogs.com/goldlong/p/8027997.html
+https://www.cnblogs.com/tjyoung/p/6832234.html
+
+7.此项目还用到了其它的插件，因此也要通过npm下载对应依赖
+
+配置完后拉取github上的代码即可
+	vue-router：创建时需要选择
+	axios： npm install axios
+		--官方文档：https://www.kancloud.cn/yunye/axios/234845
+	qs：npm install qs
+		--官方文档：https://www.npmjs.com/package/qs
+	js-cookie：npm install js-cookie --save
+		--文档：https://www.jianshu.com/p/6e1bacd35f59
+	elementUI：npm i element-ui -S
+		--官方文档：https://element.eleme.cn/#/zh-CN
