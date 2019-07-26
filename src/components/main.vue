@@ -84,7 +84,7 @@
                             </el-menu-item>
                         </router-link>
                         <router-link to="/refundCompensation" tag="div">
-                            <el-menu-item index="refundCompensation">
+                            <el-menu-item v-if="identity === 'ECWEB'||identity === 'SALEMAN'" index="refundCompensation">
                                 <i class="iconfont icon-color">&#xe6ee;</i>
                                 <span slot="title">退货赔偿</span>
                                 <el-badge v-if="getRefund > 0 && identity === 'ECWEB'" class="mark r" :value="getRefund" />
@@ -664,7 +664,7 @@ export default {
 
 <style>
 .el-badge__content{
-    border: none;
+    border: none!important;
 }
 </style>
 
