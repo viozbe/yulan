@@ -1,7 +1,8 @@
 import { get, post, patch, put} from './http'
 import Axios from 'axios'
 
-const baseUrl = 'http://106.14.159.244:8080/yulan-capital';
+//const baseUrl = 'http://106.14.159.244:8080/yulan-capital';
+const baseUrl = 'http://14.29.223.114:10250/yulan-capital';
 
 //通过cid查询用户基本信息
 export function getSaleManData(data){
@@ -43,14 +44,14 @@ export function getAllRefund(data){
 //编号查询特定的赔偿确认书
 export function getRefundById(data){
     return get(baseUrl+'/returnCompensationBill/getReturnCompensationBillByID.do',data).then((res) =>{
-        return Promise.resolve(res);
+        return Promise.resolve(res.data);
     }).catch((err) =>{
         return Promise.reject(err);
     })
 }
 //删除某个赔偿确认书(内部人员)
 export function deleteRefund(data){
-    return post(baseUrl+'/returnCompensationBill/deleteReturnCompensationBill.do',data).then((res) =>{
+    return get(baseUrl+'/returnCompensationBill/deleteReturnCompensationBill.do',data).then((res) =>{
         return Promise.resolve(res);
     }).catch((err) =>{
         return Promise.reject(err);
@@ -66,7 +67,15 @@ export function updateRefund(data){
 }
 //修改赔偿书的状态(客户)
 export function updataRefundStatus(data){
-    return post(baseUrl+'/returnCompensationBill/updateReturnCompensationBillState.do',data).then((res) =>{
+    return get(baseUrl+'/returnCompensationBill/updateReturnCompensationBillState.do',data).then((res) =>{
+        return Promise.resolve(res);
+    }).catch((err) =>{
+        return Promise.reject(err);
+    })
+}
+//修改赔偿书的打印标志
+export function updatePrinted(data){
+    return get(baseUrl+'/returnCompensationBill/alterPrinted.do',data).then((res) =>{
         return Promise.resolve(res);
     }).catch((err) =>{
         return Promise.reject(err);

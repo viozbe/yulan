@@ -82,8 +82,9 @@
                                 style="width: 100%;"
                                 v-model="scope1.row.count" 
                                 :min="1"
+                                :max="1"
+                                :disabled="true"
                                 :step="1"
-                                @change="getChange(scope.$index,scope1.$index,scope1.row)"
                                 step-strictly>
                             </el-input-number>
                         </template>
@@ -338,6 +339,7 @@ export default {
             }
         },
         //数量修改
+        //7.23新需求，数量不作修改，仅为1
         getChange(index0,index1,data){
             //判断数量是否为整数
             if(!Number.isInteger(data.count)){
@@ -524,7 +526,9 @@ export default {
                     itemNoSample: (_itemNoSample === null)?val[i].modelNumber:_itemNoSample,//样本型号
                     partSendId: '0',//分批发货标志，0不可以，1可以
                     productionVersion: _data.item.itemVersion,//产品版本
-                    qtyRequired: val[i].count.toString(),//数量
+                    //7.23新需求只要1个
+                    qtyRequired: '1',
+                    //qtyRequired: val[i].count.toString(),//数量
                     //notes: '',//备注
                     unitPrice:val[i].price.toString(),//单价
                     promotionCost: '0',//(必传，初为0)

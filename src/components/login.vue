@@ -88,6 +88,7 @@ export default {
                 Cookies.set('realName',res.data.realName);
                 companyId = (res.data.companyId === null)?'null':res.data.companyId
                 Cookies.set('companyId',companyId)
+                Cookies.set('customerMainId',res.data.customerMainId)
                 Cookies.set('identity',res.data.type)
                 if(res.customerType === ''){
                     if(res.data.type === 'USER'){

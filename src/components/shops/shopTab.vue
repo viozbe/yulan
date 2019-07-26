@@ -1,6 +1,6 @@
 <template>
     <div id="shopTabCon">
-        <el-table
+        <el-table 
             id="shopTabTable"
             class="loading-area"
             :data="tableData"

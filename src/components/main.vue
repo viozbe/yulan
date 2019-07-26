@@ -64,30 +64,32 @@
                                 <span slot="title">银行汇款凭证</span>
                             </el-menu-item>
                         </router-link>
-                        <!-- <router-link to="/painting" tag="div">
-                            <el-menu-item v-if="isManager !== '1'" index="painting">
+                        <router-link to="/painting" tag="div">
+                            <el-menu-item v-if="customerType !== '110'" index="painting">
+                                <i class="iconfont icon-color">&#xe7fb;</i>
+                                <span slot="title">委托喷绘书</span>
+                                <el-badge v-if="getPainting > 0" class="mark r" :value="getPainting" />
+                            </el-menu-item>
+                        </router-link>
+                        <router-link to="/yulanPainting" tag="div">
+                            <el-menu-item v-if="customerType === '110'" index="yulanPainting">
                                 <i class="iconfont icon-color">&#xe7fb;</i>
                                 <span slot="title">委托喷绘书</span>
                             </el-menu-item>
                         </router-link>
-                        <router-link to="/yulanPainting" tag="div">
-                            <el-menu-item v-if="isManager === '1'" index="yulanPainting">
-                                <i class="iconfont icon-color">&#xe7fb;</i>
-                                <span slot="title">委托喷绘书</span>
-                            </el-menu-item>
-                        </router-link> -->
                         <router-link to="/deputeBrush" tag="div">
                             <el-menu-item v-if="isManager === '1'" index="deputeBrush">
                                 <i class="iconfont icon-color">&#xe617;</i>
                                 <span slot="title">任务查询</span>
                             </el-menu-item>
                         </router-link>
-                        <!-- <router-link to="/refundCompensation" tag="div">
+                        <router-link to="/refundCompensation" tag="div">
                             <el-menu-item index="refundCompensation">
                                 <i class="iconfont icon-color">&#xe6ee;</i>
-                                <span slot="title">退款赔偿</span>
+                                <span slot="title">退货赔偿</span>
+                                <el-badge v-if="getRefund > 0 && identity === 'ECWEB'" class="mark r" :value="getRefund" />
                             </el-menu-item>
-                        </router-link> -->
+                        </router-link>
                         <el-submenu index="design">
                             <template slot="title"><i class="iconfont icon-color">&#xe7fb;</i><span>设计</span></template>
                             <el-menu-item-group>
@@ -220,6 +222,10 @@
 import{
     getUserMoney
 } from '@/api/user'
+import{
+    getAllRefund
+} from '@/api/refund'
+import { getIconNumber } from '@/api/painting'
 import screenfull from 'screenfull'
 import { mapMutations, mapActions } from 'vuex'
 import { mapState } from 'vuex'
@@ -234,8 +240,7 @@ export default {
             isManager:Cookies.get('isManager'),
             customerType: Cookies.get('customerType'),
             realName: Cookies.get('realName'),
-            // inputId: '',        //伪ID
-            // inputCtype: '',     //伪用户类型
+            identity: Cookies.get('identity'),
             asideUrl: [
                 'shops/curtain',
                 'shops/softSuit',
@@ -264,39 +269,74 @@ export default {
         ...mapMutations('navTabs', [
             'addTab'
         ]),
+        ...mapMutations('badge',[
+            'changeBadge'
+        ]),
         ...mapActions('navTabs',[
             'closeTab',
             'closeToTab'
         ]),
-        // //切换账号
-        // changeId(){
-        //     if(this.inputId === ''){
-        //         this.$alert('请输入用户id', '提示', {
-        //             type: 'warning',
-        //             confirmButtonText: '确定'
-        //         });
-        //         return;
-        //     }
-        //     if(this.inputCtype === ''){
-        //         this.$alert('请输入用户类型', '提示', {
-        //             type: 'warning',
-        //             confirmButtonText: '确定'
-        //         });
-        //         return;
-        //     }
-        //     Cookies.set('cid',this.inputId);
-        //     Cookies.set('customerType',this.inputCtype);
-        //     console.log(Cookies.get('cid'));
-        //     this.userMoney();
-        //     this.dialogFormVisible = false;
-        //     location.reload();
-        // },
-        // //取消切换
-        // quitId(){
-        //     this.inputId = '';
-        //     this.inputCtype = '';
-        //     this.dialogFormVisible = false;
-        // },
+        /*
+            // 切换账号
+            // changeId(){
+            //     if(this.inputId === ''){
+            //         this.$alert('请输入用户id', '提示', {
+            //             type: 'warning',
+            //             confirmButtonText: '确定'
+            //         });
+            //         return;
+            //     }
+            //     if(this.inputCtype === ''){
+            //         this.$alert('请输入用户类型', '提示', {
+            //             type: 'warning',
+            //             confirmButtonText: '确定'
+            //         });
+            //         return;
+            //     }
+            //     Cookies.set('cid',this.inputId);
+            //     Cookies.set('customerType',this.inputCtype);
+            //     console.log(Cookies.get('cid'));
+            //     this.userMoney();
+            //     this.dialogFormVisible = false;
+            //     location.reload();
+            // },
+            // //取消切换
+            // quitId(){
+            //     this.inputId = '';
+            //     this.inputCtype = '';
+            //     this.dialogFormVisible = false;
+            // },
+        */
+        //获取角标情况【退货】
+        async addBadgeIcon(){
+            if(Cookies.get('identity') === 'ECWEB'){
+                let _refund = await getAllRefund({
+                    CID: this.cid,
+                    page: 1,
+                    number: 1,
+                    state: 'CUSTOMERAFFIRM'
+                })
+                this.changeBadge({
+                    name: 'refund',
+                    index: _refund.count
+                })
+            }
+        },
+        //获取角标情况【委托】
+        async PaintingIcon(){
+                let _refund = await getIconNumber({
+                    cid: this.cid,
+                    page: 1,
+                    limit: 999,
+                    startDate:'' ,
+                    endDate:'',
+                    state: 'CUSTOMERAFFIRM'
+                })
+                this.changeBadge({
+                    name: 'painting',
+                    index: _refund.airbrushDesignerAssureList.length
+                })
+        },
         //获取用户余额情况
         userMoney(){
             getUserMoney({
@@ -378,6 +418,12 @@ export default {
         ...mapState('navTabs',[
             'tabList'
         ]),
+        getRefund(){
+            return this.$store.getters['badge/getRefund']
+        },
+        getPainting(){
+            return this.$store.getters['badge/getPainting']
+        },
         key(){
             return this.$route.name !== undefined? this.$route.name: this.$route
         },
@@ -453,6 +499,8 @@ export default {
         this.userMoney();
         this.getPath();
         this.addTab(this.defaultUrl);
+        this.addBadgeIcon();
+        this.PaintingIcon();
         document.onkeydown = function (event) {
             var key = window.event.keyCode;
             if(key == 27){
@@ -614,4 +662,9 @@ export default {
 }
 </style>
 
+<style>
+.el-badge__content{
+    border: none;
+}
+</style>
 

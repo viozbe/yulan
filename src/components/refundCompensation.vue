@@ -32,9 +32,9 @@
                             :value="item.value">
                         </el-option>
                     </el-select>
-                    <el-button type="success" @click.native="searchRefund">查 询</el-button>
+                    <el-button type="success" @click.native="clickSearch">查 询</el-button>
                     <el-button type="warning" @click.native="resetSearch">重 置</el-button>
-                    <el-button type="primary" @click.native="insertRefund" class="fr">新 建</el-button>
+                    <el-button type="primary" @click.native="insertRefund" v-if="identity==='SALEMAN'" class="fr">新 建</el-button>
                 </div>
                 <div class="search" v-if="identity === 'SALEMAN'">
                     <span>型号：</span>
@@ -65,6 +65,7 @@
                         prop="id">
                     </el-table-column>
                     <el-table-column
+                        min-width="130"
                         label="创建时间">
                         <template slot-scope="scope">
                             {{toLocale(scope.row.createTs)}}
@@ -96,7 +97,7 @@
                         prop="erpCreatorname">
                     </el-table-column>
                     <el-table-column
-                        min-width="130"
+                        min-width="90"
                         label="操作">
                         <template slot-scope="scope">
                             <el-tooltip content="查看" placement="top">
@@ -127,7 +128,7 @@
                                 </el-button>
                             </el-tooltip>
                             <el-tooltip 
-                                v-if="scope.row.state === 'ONCREATE' && scope.row.erpCreator === cid"
+                                v-if="scope.row.state === 'ONCREATE' && scope.row.erpCreator === cid && scope.row.itemCount === 0"
                                 content="删除" 
                                 placement="top">
                                 <el-button circle style="padding: 7px;"
@@ -142,6 +143,14 @@
                         v-if="identity === 'SALEMAN'"
                         label="打印标记"
                         prop="printed">
+                        <template slot-scope="scope">
+                            <el-checkbox 
+                                v-if="scope.row.state === 'APPROVED' || scope.row.state === 'CANCELED'"
+                                @change="changePrinted(scope.row,scope.$index)"
+                                v-model="scope.row.printed">
+                                {{(scope.row.printed === false)?'未打印':'已打印'}}
+                            </el-checkbox>
+                        </template>
                     </el-table-column>
                 </el-table>
                 <el-pagination style="width: 100%;" 
@@ -168,7 +177,8 @@ import {
     getRefundById,
     deleteRefund,
     updataRefundStatus,
-    updateRefund
+    updateRefund,
+    updatePrinted
 } from '@/api/refund'
 import { mapMutations, mapActions } from 'vuex'
 import { mapState } from 'vuex'
@@ -206,10 +216,35 @@ export default {
         }
     },
     methods:{
+        //初始化最新一周时间
+        initDate(){
+            let to = new Date()
+            let from = new Date(to.getTime() - 7*24*60*60*1000)
+            this.dateFrom = from.getFullYear()+'-'+this.addZeroIfNeed(from.getMonth()+1)+'-'+this.addZeroIfNeed(from.getDate())
+            this.dateTo = to.getFullYear()+'-'+this.addZeroIfNeed(to.getMonth()+1)+'-'+this.addZeroIfNeed(to.getDate())
+        },
+        //展开搜索
+        clickSearch(){
+            this.currentPage = 1
+            this.searchRefund()
+        },
+        //初始化角标
+        async initBadge(){
+            let _refund = await getAllRefund({
+                CID: this.cid,
+                page: 1,
+                number: 1,
+                state: 'CUSTOMERAFFIRM'
+            })
+            this.changeBadge({
+                name: 'refund',
+                index: _refund.count
+            })
+        },
         //按条件搜索
         searchRefund(){
             let obj = {
-                CID: this.cid,          //客户ID
+                CID: (this.identity === 'SALEMAN')?'':this.cid,          //客户ID
                 page: this.currentPage, //第几页
                 number: this.pageSize,  //一页有多少数据
                 startDate: this.dateFrom,   //开始日期
@@ -222,6 +257,9 @@ export default {
             let filter = this.$options.filters['propertyFilter']
             getAllRefund(filter(obj)).then(res =>{
                 this.tableData = res.data
+                this.tableData.forEach(item =>{
+                    item.printed = (item.printed === '0')?true:false
+                })
                 this.allNum = res.count
             }).catch(err =>{
                 this.tableData = []
@@ -296,6 +334,8 @@ export default {
                     this.$alert('撤回成功','提示',{
                         type: 'success',
                         confirmButtonText: '好的'
+                    }).then(() =>{
+                        this.searchRefund()
                     }).catch(() =>{})
                 }).catch(err =>{
                     this.$alert('撤回失败','提示',{
@@ -305,7 +345,9 @@ export default {
                 })
             }
             else if(method === 'delete'){
-                deleteRefund(data.id).then(res =>{
+                deleteRefund({
+                    id: data.id
+                }).then(res =>{
                     this.$alert('删除成功','提示',{
                         type: 'success',
                         confirmButtonText: '好的'
@@ -330,6 +372,13 @@ export default {
         handleCurrentChange(val) {
             this.currentPage = val
             this.searchRefund()
+        },
+        //修改打印标记
+        changePrinted(value,index){
+            updatePrinted({
+                id: value.id,
+                printed: (value.printed)?'0':'1'
+            }).catch(() =>{})
         },
         //隔行变色
         tableRowClassName({row, rowIndex}){
@@ -375,6 +424,9 @@ export default {
         ...mapMutations('navTabs', [
             'addTab'
         ]),
+        ...mapMutations('badge',[
+            'changeBadge'
+        ]),
         ...mapActions('navTabs',[
             'closeTab',
             'closeToTab'
@@ -384,9 +436,11 @@ export default {
         //区分客户类型做一些初始化
         if(this.identity === 'SALEMAN'){
             this.chooseState = null
+            this.initDate()
         }
         else if(this.identity === 'ECWEB'){
             this.chooseState = 'CUSTOMERAFFIRM'
+            this.initBadge()
         }
         this.searchRefund()
     },

@@ -1,10 +1,10 @@
 <template>
-    <div id="detailRefund">
+    <div id="detailRefund" class="rel">
         <el-card shadow="hover">
-            <div class="f16" style="border:1px solid #000">
+            <div id="printTable" class="f16" style="width: 1064px; border:1px solid #000; margin: -1px;">
                 <h3 class="mt5 tc rel">
                     客户确认书【{{getNameByState(baseData.state)}}】
-                    <i v-if="baseData.state === 'APPROVED' || (baseData.state === 'CANCELED' && 1)"
+                    <i v-if="baseData.state === 'APPROVED' || (baseData.state === 'CANCELED' && identity === 'SALEMAN')"
                         class="icon-print el-icon-printer cpoi"
                         @click="printRefund"></i>
                 </h3>
@@ -12,14 +12,14 @@
                 <p class="ovh">
                     <el-button class="l" size="small">重要文件</el-button>
                     <a v-if="baseData.method === 'edit' || (baseData.method === 'new' && item.length !== 0)"
-                        @click="updateOrDelete" class="r cpoi">
+                        @click="updateOrDelete(1)" class="r cpoi">
                         <i :class="[(item.length===0)?'el-icon-error error-icon':'el-icon-success success-icon']">
                             {{judgeOpa}}
                         </i>
                     </a>
-                    <a v-else-if="baseData.method === 'see' && baseData.state === 'ONCREATE' && baseData.cid === cid">
-                        <i @click="userOperation(0)" class="el-icon-error error-icon r cpoi">不同意</i>
-                        <i @click="userOperation(1)" class="el-icon-success success-icon r cpoi">同意</i>
+                    <a v-else-if="baseData.method === 'see' && baseData.state === 'CUSTOMERAFFIRM' && baseData.cid === cid">
+                        <i @click="userOperation(0)" class="el-icon-error error-icon r cpoi mr10">不同意</i>
+                        <i @click="userOperation(1)" class="el-icon-success success-icon r cpoi mr10">同意</i>
                     </a>
                 </p>
                 <section class="mt10">
@@ -67,11 +67,11 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <table id="moneyTable" border="0" style="width: 100%;" v-if="item.length > 0 && baseData.method !== 'see'">
+                <table id="moneyTable" border="0" style="width: 100%;" v-if="item.length > 0">
                     <tr>
                         <td width="12.5%">金额（小写）</td>
                         <td width="50%" class="tr">{{totalMoney}}</td>
-                        <td width="37.5%" rowspan="2"></td>
+                        <td :width="(baseData.method === 'see')?'25%':'37.5%'" rowspan="2"></td>
                     </tr>
                     <tr>
                         <td width="12.5%">金额（大写）</td>
@@ -94,9 +94,9 @@
                         <div class="t-com dib border-r l">
                             广东玉兰集团股份有限公司<br>
                             市场部<br>
-                            {{new Date(baseData.createTS).getFullYear()}}年
-                            {{addZeroIfNeed(new Date(baseData.createTS).getMonth()+1)}}月
-                            {{addZeroIfNeed(new Date(baseData.createTS).getDate())}}日
+                            {{new Date(baseData.createTs).getFullYear()}}年
+                            {{addZeroIfNeed(new Date(baseData.createTs).getMonth()+1)}}月
+                            {{addZeroIfNeed(new Date(baseData.createTs).getDate())}}日
                         </div>
                         <div class="t-com dib r">
                             经销商
@@ -116,7 +116,21 @@
                         <span>建立时间：{{toLocaleTime}}&emsp;</span>
                     </section>
                 </section>
-            </div> 
+            </div>
+            <div class="tc mt20">
+                <el-button v-if="baseData.method !== 'see'"
+                    type="danger" 
+                    style="margin-right: 20px;" 
+                    width="130px"
+                    :disabled="item.length === 0"
+                    @click.native="updateOrDelete(0)">
+                    保存修改
+                </el-button>
+                <el-button type="info" style="margin-left: 20px;" width="130px"
+                    @click.native="returnBack">
+                    返回
+                </el-button>
+            </div>
         </el-card>
         <el-dialog title="填写货品信息"
             width="500px"
@@ -141,7 +155,11 @@
                     </currency-input>
                 </el-form-item>
                 <el-form-item label="金额">
-                    <el-input style="width:300px;" v-model="itemMsg.totalmoney"></el-input>
+                    <currency-input
+                        v-model="itemMsg.totalmoney"
+                        :placeholder="''"
+                        :customStyle="'width: 300px; height: 40px;'">
+                    </currency-input>
                 </el-form-item>
                 <el-form-item label="质量问题">
                     <el-input style="width:300px;" v-model="itemMsg.notes"></el-input>
@@ -161,6 +179,7 @@
     </div>
 </template>
 <script>
+import print from 'print-js'
 import '@/assets/css/base.css'
 import {
     digitUppercase
@@ -186,6 +205,7 @@ export default {
     data(){
         return{
             cid: Cookies.get('cid'),
+            identity: Cookies.get('identity'),
             baseData: {},       //存放赔偿的详细数据
             //商品表格
             item: [], 
@@ -207,15 +227,21 @@ export default {
         async init(){
             let method = this.baseData.method
             if(method !== 'new'){
-                let _data = await getRefundById({ id: this.baseData.id })
+                let obj = { id: this.baseData.id }
+                console.log(obj);
+                let _data = await getRefundById(obj)
                 _data.method = method
+                _data.rtcbItems.forEach(item =>{
+                    if(item.unit === '°ü')  item.unit = '包'
+                })
                 this.baseData = _data
+                this.item = _data.rtcbItems
                 console.log(this.baseData)
             }
             else{
                 this.baseData.erpCreatorname = Cookies.get('realName')
-                if(!this.baseData.createTS){
-                    this.baseData.createTS = new Date().getTime()
+                if(!this.baseData.createTs){
+                    this.baseData.createTs = new Date().getTime()
                     sessionStorage.setItem('refund',JSON.stringify(this.baseData))
                 }
             }
@@ -231,7 +257,7 @@ export default {
                     this.clearItemMsg()
                     this.itemMsg.itemNo = res.itemNo
                     this.itemMsg.productionVersion = res.productVersionName
-                    this.itemMsg.unit = res.unit
+                    this.itemMsg.unit = (res.unit === '°ü')?'包':res.unit
                     this.dialogFormVisible = true
                 }).catch(err =>{
                     this.$alert(`${value}--未查询到货品信息`,'提示',{
@@ -292,7 +318,7 @@ export default {
             });
         },
         //提交或者删除确认书
-        updateOrDelete(){
+        updateOrDelete(status){
             //判断商品个数,0--删除，!0--提交
             if(this.item.length === 0){
                 let obj = {
@@ -327,25 +353,52 @@ export default {
                 //new--新建
                 if(this.baseData.method === 'new'){
                     addRefund(obj).then(res =>{
-                        this.$alert('添加成功','提示',{
-                            type: 'success',
-                            confirmButtonText: '好的'
-                        }).then(res =>{
-                            this.returnBack()
-                        }).catch(err =>{
-                            this.returnBack()
-                        })
+                        if(status === 1){
+                            obj.id = res.data
+                            obj.state = 'CUSTOMERAFFIRM'
+                            updateRefund(obj).then(res =>{
+                                this.$alert('提交成功','提示',{
+                                    type: 'success',
+                                    confirmButtonText: '好的'
+                                }).then(res =>{
+                                    this.returnBack()
+                                }).catch(err =>{
+                                    this.returnBack()
+                                })
+                            }).catch(() =>{
+                                throw '提交失败'
+                            })
+                        }
+                        else{
+                            this.$alert('添加成功','提示',{
+                                type: 'success',
+                                confirmButtonText: '好的'
+                            }).then(res =>{
+                                this.returnBack()
+                            }).catch(err =>{
+                                this.returnBack()
+                            })
+                        }
                     }).catch(err =>{
-                        this.$alert('删除失败','提示',{
+                        this.$alert('添加失败','提示',{
                             type: 'warning',
                             confirmButtonText: '好的'
                         }).catch(() =>{})
                     })
                 }
                 //edit--修改
-                else if(his.baseData.method === 'edit'){
+                else if(this.baseData.method === 'edit'){
+                    //status：1--提交，0--保存
+                    let tipWord = ''
+                    if(status === 1){
+                        tipWord = '提交',
+                        obj.state = 'CUSTOMERAFFIRM'
+                    }
+                    else {
+                        tipWord = '保存'
+                    }
                     updateRefund(obj).then(res =>{
-                        this.$alert('修改成功','提示',{
+                        this.$alert(`${tipWord}成功`,'提示',{
                             type: 'success',
                             confirmButtonText: '好的'
                         }).then(res =>{
@@ -367,13 +420,16 @@ export default {
             //1--同意 0--不同意
             let obj = {
                 id: this.baseData.id,
-                satte: (flag)?'APPROVED':'CANCELED'
+                state: (flag)?'APPROVED':'CANCELED'
             }
             updataRefundStatus(obj).then(res =>{
                 //成功后，调用查询接口，重新覆盖渲染
-                getRefundById(this.baseData.id).then(res =>{
+                getRefundById({
+                    id: this.baseData.id
+                }).then(async res =>{
                     this.baseData = res
                     this.baseData.method = 'see'
+                    this.releaseBadge('refund')
                     this.init()
                 }).catch(err =>{
                     this.$alert('加载失败，返回原先页面','提示',{
@@ -398,7 +454,13 @@ export default {
         },
         //执行打印操作
         printRefund(){
-
+            printJS({
+                printable: 'printTable', 
+                type: 'html', 
+                maxWidth: 1300,
+                headerStyle: 'margin: -2px;',
+                targetStyles: ['*']
+            })
         },
         //给小于10的数字加前缀
         addZeroIfNeed(num){
@@ -425,6 +487,10 @@ export default {
         ...mapMutations('navTabs', [
             'addTab'
         ]),
+        ...mapMutations('badge',[
+            'addBadge',
+            'releaseBadge'
+        ]),
         ...mapActions('navTabs',[
             'closeTab',
             'closeToTab'
@@ -437,7 +503,7 @@ export default {
         },
         //返回特定格式的时间戳
         toLocaleTime:function(){
-            return toLocale(this.baseData.createTS)
+            return toLocale(this.baseData.createTs)
         },
         //返回总金额
         totalMoney:function(){
@@ -476,6 +542,7 @@ export default {
 </style>
 
 <style scoped>
+@page { size: landscape; }
 p{ margin: 5px 0; }
 .success-icon{color: #279e25; }
 .error-icon{ color: crimson; }
@@ -485,6 +552,8 @@ p{ margin: 5px 0; }
 .border-b{ border-bottom: 1px solid #000; }
 .border-r{ border-right: 1px solid #000; }
 .p20{ padding: 10px 0; }
+.mb10{ margin-bottom: 10px; }
+.mr40{ margin-right: 40px; }
 .p-click{
     position: relative;
     bottom: 3px;
