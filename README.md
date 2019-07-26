@@ -1,6 +1,6 @@
 # yulan
 
-#tip
+# tip
 > 打印插件安装  npm install print-js --save
 > 参考网址  https://printjs.crabbly.com/#documentation
 
