@@ -88,7 +88,7 @@
             <el-table-column prop="NOTE" label="类型" align="center"></el-table-column>
             <el-table-column label="数量" align="center" width="150">
               <template slot-scope="scope1">
-                <span v-if="scope1.row.UNIT=='平方米'">{{scope1.row.CURTAIN_HEIGHT}}×{{scope1.row.CURTAIN_WIDTH}}={{scope1.row.QTY_REQUIRED}}</span>
+                <span v-if="scope1.row.UNIT=='平方米'">{{scope1.row.CURTAIN_WIDTH}}×{{scope1.row.CURTAIN_HEIGHT}}={{scope1.row.QTY_REQUIRED}}</span>
                 <span v-else>{{scope1.row.QTY_REQUIRED}}</span>
               </template>
             </el-table-column>

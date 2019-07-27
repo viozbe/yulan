@@ -140,7 +140,7 @@
                 <el-table-column label="面料属性"
                     align="center">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.fixType !== '' && scope.row.productType !== 'XHB'">
+                        <div v-if="scope.row.fixType !== '' && scope.row.fixType !== null && scope.row.productType === 'ML'">
                             <el-select
                                 size="mini" 
                                 v-model="scope.row.fixType" 

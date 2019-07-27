@@ -26,17 +26,17 @@
                         v-model="chooseState" 
                         placeholder="请选择">
                         <el-option
-                            v-for="item in (identity==='SALEMAN')?stateOptionSaleman:stateOptionEcweb"
+                            v-for="item in (identity==='USER')?stateOptionUser:stateOptionEcweb"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
                         </el-option>
                     </el-select>
                     <el-button type="success" @click.native="clickSearch">查 询</el-button>
-                    <el-button type="warning" @click.native="resetSearch">重 置</el-button>
-                    <el-button type="primary" @click.native="insertRefund" v-if="identity==='SALEMAN'" class="fr">新 建</el-button>
+                    <el-button type="warning" @click.native="resetSearch" v-if="identity==='USER'">重 置</el-button>
+                    <el-button type="primary" @click.native="insertRefund" v-if="identity==='USER'" class="fr">新 建</el-button>
                 </div>
-                <div class="search" v-if="identity === 'SALEMAN'">
+                <div class="search" v-if="identity === 'USER'">
                     <span>型号：</span>
                     <el-input clearable
                         style="width: 14%;" 
@@ -72,7 +72,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        v-if="identity === 'SALEMAN'"
+                        v-if="identity === 'USER'"
                         label="客户名称"
                         prop="cname">
                     </el-table-column>
@@ -92,7 +92,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        v-if="identity === 'SALEMAN'"
+                        v-if="identity === 'USER'"
                         label="创建人"
                         prop="erpCreatorname">
                     </el-table-column>
@@ -140,7 +140,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        v-if="identity === 'SALEMAN'"
+                        v-if="identity === 'USER'"
                         label="打印标记"
                         prop="printed">
                         <template slot-scope="scope">
@@ -195,7 +195,7 @@ export default {
             dateFrom: '',       //时间搜索--起
             dateTo: '',         //时间搜索--止
             //状态搜索
-            stateOptionSaleman:[
+            stateOptionUser:[
                 { value: null, label: '全部状态'},
                 { value: 'ONCREATE', label: '处理中' },
                 { value: 'CUSTOMERAFFIRM', label: '客户确认中' },
@@ -244,7 +244,7 @@ export default {
         //按条件搜索
         searchRefund(){
             let obj = {
-                CID: (this.identity === 'SALEMAN')?'':this.cid,          //客户ID
+                CID: (this.identity === 'USER')?'':this.cid,          //客户ID
                 page: this.currentPage, //第几页
                 number: this.pageSize,  //一页有多少数据
                 startDate: this.dateFrom,   //开始日期
@@ -434,7 +434,7 @@ export default {
     },
     created(){
         //区分客户类型做一些初始化
-        if(this.identity === 'SALEMAN'){
+        if(this.identity === 'USER'){
             this.chooseState = null
             this.initDate()
         }

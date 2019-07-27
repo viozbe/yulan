@@ -216,7 +216,7 @@
                       <td class="grayTD">编号</td>
                       <td>{{tableData.id}}</td>
                       <td class="grayTD">建立人</td>
-                      <td>{{tableData.erpCreator}}</td>
+                      <td>{{tableData.realName}}</td>
                       <td class="grayTD">建立时间</td>
                       <td>{{tableData.createTs | datatrans}}</td>
                     </tr>
@@ -292,7 +292,7 @@
                         <p>按照本人提供的图片进行相应定制提供给本人，无义务对本人提供的图片进行实质审查。 本人因该图片的</p>
                         <p>著作权或使用权问题与第三方发生纠纷，受托人将不承担任何的法律责任，由此造成的损失由本人全部承担。</p>
                         <p></p><br><br>
-                        <p>受托人签名（盖章）：{{tableData.customerAgent}}&nbsp;&nbsp;&nbsp;&nbsp;确认时间：{{tableData.reassureTs | datatrans}}</p>
+                        <p v-if="agree">受托人签名（盖章）：{{tableData.customerAgent}}&nbsp;&nbsp;&nbsp;&nbsp;确认时间：{{tableData.reassureTs | datatrans}}</p>
                       </td>
                     </tr>
                     </table>
@@ -366,6 +366,7 @@ export default {
     data(){
         return{
             lookORedit:false,
+            agree:false,
             abdrImage:[
               /* {
                   "imageIndex": 1,//图片序号
@@ -473,6 +474,13 @@ export default {
     methods:{
     //提交
     _changeStatus(id){
+      if(this.abdrImage.length===0){
+          this.$alert('请上传图片及相关信息', "提示", {
+              confirmButtonText: "确定",
+              type: "warning"
+          });
+          return
+      }
         let url = Quest + '/AirbrushDesignerAssure/updateAirbrushDesignerAssure.do'
         let data = {
             id:id,
@@ -549,7 +557,7 @@ export default {
       let url = Quest + '/customer/getSingleCustomerInfo.do';
       let data = {
         companyId:this.checkID,
-	      erpCreator:Cookies.get('companyId') //创建人ID
+	      erpCreator:Cookies.get('cid') //创建人
       }
       getWaterNumber(url,data).then(res => {
 
@@ -559,7 +567,7 @@ export default {
           if(res.code == 0){
             this.sumbit.abdrId = res.AirbrushDesignerAssure.id;
             this.sumbit.createTs = res.AirbrushDesignerAssure.createTs;
-            this.sumbit.erpCreator = res.AirbrushDesignerAssure.erpCreator;
+            this.sumbit.erpCreator = res.AirbrushDesignerAssure.realName;
 
             this.checkData.customerCode = res.customerInfo.customerCode;
             this.checkData.shortName = res.customerInfo.shortName;
@@ -582,7 +590,7 @@ export default {
     _getList(){
       let url =Quest + '/AirbrushDesignerAssure/getAirbrushDesignerAssure.do'
       let data ={
-        "cid":'', //客户ID
+        "cid":this.cid, //客户ID
         "startDate":this.startDate , //开始日期
         "endDate":this.endDate, //结束日期
         "state":this.status, //确认书状态
@@ -603,6 +611,13 @@ export default {
     },
     //查看表格
     lookIt(tab){
+      this.isCHULI = false;
+      if(tab.state == 'APPROVED'){
+        this.agree = true;
+      }
+      else{
+        this.agree = false;
+      }
         this.abdrImage = [];
         this.lookDia = true ;
         console.log(tab);

@@ -2,9 +2,14 @@
     <div id="detailRefund" class="rel">
         <el-card shadow="hover">
             <div id="printTable" class="f16" style="width: 1064px; border:1px solid #000; margin: -1px;">
-                <h3 class="mt5 tc rel">
+                <section class="f14 t-foot border-b tr">
+                    <span v-if="baseData.method !== 'new'">编号：{{baseData.id}}</span>
+                    <span>创建人：{{baseData.erpCreatorname}}</span>
+                    <span>建立时间：{{toLocaleTime}}&emsp;</span>
+                </section>
+                <h3 class="mt10 tc rel">
                     客户确认书【{{getNameByState(baseData.state)}}】
-                    <i v-if="baseData.state === 'APPROVED' || (baseData.state === 'CANCELED' && identity === 'SALEMAN')"
+                    <i v-if="baseData.state === 'APPROVED' || (baseData.state === 'CANCELED' && identity === 'USER')"
                         class="icon-print el-icon-printer cpoi"
                         @click="printRefund"></i>
                 </h3>
@@ -109,11 +114,6 @@
                                 {{addZeroIfNeed(new Date(baseData.reassureTs).getDate())}}日
                             </span>
                         </div>
-                    </section>
-                    <section class="t-foot border-t tr">
-                        <span v-if="baseData.method !== 'new'">编号：{{baseData.id}}</span>
-                        <span>确认人：{{baseData.erpCreatorname}}</span>
-                        <span>建立时间：{{toLocaleTime}}&emsp;</span>
                     </section>
                 </section>
             </div>

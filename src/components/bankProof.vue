@@ -394,6 +394,8 @@ import { getBankList,getPayBillContent,changeStatus,sumbitForm,getHistory } from
 import Cookies from 'js-cookie'
 const Head = 'http://14.29.223.114:10250/upload';
 const Quest = 'http://14.29.223.114:10250/yulan-capital'
+//const Head = 'http://192.168.123.43:8080/upload';
+//const Quest = 'http://192.168.123.43:8080/yulan-capital'
 export default {
     name: 'BankProof',
     data(){
@@ -639,6 +641,8 @@ export default {
         }
         this.sumbit.imgUrl = this.sqlpath;
         this.sumbit.submitTs = null;
+        this.sumbit.cancelTs = null;
+        this.sumbit.createTs = null;
         sumbitForm(url,data).then(res => {
             console.log(res.data);
             if(res.code == 0){

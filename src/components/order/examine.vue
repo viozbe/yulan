@@ -17,6 +17,7 @@
         <span class="zoomLeft">时间：</span><span class="zoomRight">{{item.DATE_CRE}} </span>
         <span class="zoomLeft">订单号：</span><span class="zoomRight">{{item.ORDER_NO}}</span>
         <span class="zoomLeft">状态：</span><span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{item.CURTAIN_STATUS_ID | curtainStatus}}</span>
+        <span class="zoomLeft">客户名称：</span><span style="color:gray" class="zoomRight">{{item.realName}}</span>
         </div>
 
         <div class="outDiv" style="float:left;width:90%">

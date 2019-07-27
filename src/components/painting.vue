@@ -183,7 +183,7 @@
                       </td>
                     </tr>
                     </table>
-                    <div v-show="agree" style="width:180px;margin:0 auto;">
+                    <div v-show="agreeJudge" style="width:180px;margin:0 auto;">
                       <br>
                       <el-button type="success" @click="_changeStatus('同意')">同 意</el-button>
                       <el-button type="danger" @click="_changeStatus('不同意')">不同意</el-button>
@@ -224,9 +224,10 @@ export default {
               }, */
             ],
             agree:true,
+            agreeJudge:true,
             PaintingDia:false,
             limit:8,
-            count:88,
+            count:8,
             currentPage: 1,
             cid:'',
             startDate:'',
@@ -334,6 +335,12 @@ export default {
     //查看表格
     lookIt(tab){
         if(tab.state == 'CUSTOMERAFFIRM'){
+            this.agreeJudge = true;
+        }
+        else{
+            this.agreeJudge = false;
+        }
+        if(tab.state == 'CANCELED'){
             this.agree = true;
         }
         else{
