@@ -22,7 +22,7 @@
                             {{judgeOpa}}
                         </i>
                     </a>
-                    <a v-else-if="baseData.method === 'see' && baseData.state === 'CUSTOMERAFFIRM' && baseData.cid === cid">
+                    <a v-else-if="baseData.method === 'see' && baseData.state === 'CUSTOMERAFFIRM' && identity === 'ECWEB'">
                         <i @click="userOperation(0)" class="el-icon-error error-icon r cpoi mr10">不同意</i>
                         <i @click="userOperation(1)" class="el-icon-success success-icon r cpoi mr10">同意</i>
                     </a>

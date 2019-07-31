@@ -183,8 +183,14 @@ export default {
     methods:{
         //进入窗帘详情
         chooseItem(data,index){
-            if(data.width === '' || data.height === '' || data.multiple === ''){
-                this.$alert('请确保该产品的必要数据都已经输入!!','提示',{
+            let arr = []
+            let str = ''
+            if(data.width === ''){ arr.push('宽度') }
+            if(data.height === ''){ arr.push('高度') }
+            if(data.multiple === ''){ arr.push('褶皱倍数') }
+            if(arr.length !== 0){
+                str = arr.join('、')
+                this.$alert(`请确保产品${data.itemNo}的${str}已经输入!!`,'提示',{
                     confirmButtonText: '好的',
                 })
                 return ;

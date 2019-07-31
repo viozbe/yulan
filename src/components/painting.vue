@@ -340,7 +340,7 @@ export default {
         else{
             this.agreeJudge = false;
         }
-        if(tab.state == 'CANCELED'){
+        if(tab.state != 'APPROVED'){
             this.agree = true;
         }
         else{

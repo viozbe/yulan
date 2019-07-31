@@ -29,7 +29,7 @@ body { font-size: 1.6rem;}
 /*a标签初始化*/
 a { color: #409EFF; text-decoration: none; }
 a:hover { text-decoration: none; }
-ul{ list-style-type: none; }
+ul{ list-style-type: none; padding: 0; }
 
 /*-------------------------single CSS----------------------------*/
 .dn { display: none; }

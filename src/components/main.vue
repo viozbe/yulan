@@ -208,9 +208,10 @@
                             :label="item.label" 
                             :closable="item.closable">
                         </el-tab-pane>
-                        <!-- <keep-alive> -->
-                            <router-view/>
-                        <!-- </keep-alive> -->
+                        <keep-alive>
+                            <router-view v-if="$route.meta.keepAlive === true"/>
+                        </keep-alive>
+                        <router-view v-if="$route.meta.keepAlive !== true" />
                     </el-tabs>  
                 </el-main>
             </el-container>
@@ -663,6 +664,23 @@ export default {
 </style>
 
 <style>
+.el-card__header{
+    padding: 13px 20px!important;
+}
+.el-menu-item-group__title{
+    padding: 4px 0!important;
+}
+.el-menu-item, .el-submenu__title{
+    height: 45px!important;
+    line-height: 45px!important;
+}
+.el-submenu .el-menu-item{
+    height: 40px!important;
+    line-height: 40px!important;
+}
+.el-table td, .el-table th{
+    padding:8px 0!important;
+}
 .el-badge__content{
     border: none!important;
 }

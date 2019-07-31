@@ -5,7 +5,7 @@
                 :data="data"
                 :span-method="cellMerge">
                 <el-table-column
-                    min-width="140"
+                    width="170"
                     label="商品信息">
                     <template>
                         <div class="messageBox">
@@ -46,7 +46,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="名称"
-                    width="65">
+                    width="60">
                     <template slot-scope="scope">
                         {{getTypeName(scope.row.curtainPartName)}}
                         <br>
@@ -68,7 +68,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="编码"
-                    width="140">
+                    width="130">
                     <template slot-scope="scope">
                         <div>
                             <span v-if="tableStatus === 3">
@@ -127,7 +127,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="名称">
+                <el-table-column label="名称" width="100">
                     <template slot-scope="scope">
                         <div v-if="scope.row.curtainItemName !== null">{{scope.row.curtainItemName}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
@@ -141,6 +141,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="面料属性"
+                    width="100"
                     align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.certainHeightWidth !== null && scope.row.productType === 'ML'">
@@ -162,7 +163,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="用量"
-                    width="100">
+                    width="110">
                     <template slot-scope="scope">
                         <span v-if="tableStatus === 3">
                             {{scope.row.dosage|dosageFilter}}
@@ -230,7 +231,7 @@
                         </div> -->
                     </template>
                 </el-table-column>
-                <el-table-column label="说明">
+                <el-table-column label="说明" width="80">
                     <template slot-scope="scope">
                         <span style="color:red;">
                             {{scope.row.illustrate}}
@@ -241,8 +242,9 @@
                 <el-table-column label="备注">
                     <template slot-scope="scope">
                         <el-input
+                            :autosize="{ maxRows: 6 }"
                             :disabled="tableStatus === 3"
-                            size="mini"
+                            type="textarea"
                             v-model="scope.row.note"
                             clearable>
                         </el-input>
@@ -250,16 +252,18 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="兰居意见"
-                    v-if="tableStatus !== 0"
-                    width="100">
+                    v-if="tableStatus !== 0">
                     <template slot-scope="scope">
                         <el-input v-if="tableStatus === 1"
-                            size="mini"
+                            type="textarea"
+                            :autosize="{ maxRows: 6 }"
                             v-model="scope.row.suggestion"
                             clearable>
                         </el-input>
                         <el-input v-else-if="tableStatus === 2 || tableStatus === 3"
                             size="mini" disabled
+                            type="textarea"
+                            :autosize="{ maxRows: 6 }"
                             v-model="scope.row.suggestion"
                             clearable>
                         </el-input>

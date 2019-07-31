@@ -84,13 +84,14 @@
                         label="操作">
                         <template slot-scope="scope">
                             <a class="mr10" @click="seeStore(scope)">查看库存</a>
-                            <el-dialog title="商品库存" :visible.sync="dialogTableVisible" width="470px">
-                                <el-table :data="produceStore" style="width:450px;" :row-style="rowClass">
+                            <el-dialog title="库存查询" :visible.sync="dialogTableVisible" width="520px">
+                                <el-table border :data="produceStore" style="width:500px;" :row-style="rowClass">
                                     <el-table-column property="stockNo" label="库房"></el-table-column>
                                     <el-table-column property="batchNo" label="批号" width="200" show-overflow-tooltip></el-table-column>
-                                    <el-table-column property="qty" label="库存"></el-table-column>
+                                    <el-table-column property="qty" label="库存" width="70"></el-table-column>
                                 </el-table>
                                 <div slot="footer">
+                                    <p class="f14 tc border-b mb10"><b>以上数值仅供参考，以实际订单处理为准</b></p>
                                     <el-button type="success" plain @click="dialogTableVisible = false">关 闭</el-button>
                                 </div>
                             </el-dialog>
@@ -637,6 +638,9 @@ export default {
 </script>
 
 <style scoped>
+.border-b{
+    border-bottom: 1px solid black;
+}
 a:hover{ cursor: pointer; }
 #wallPaperCon .clearfix:before, 
 #wallPaperCon .clearfix:after {
@@ -682,7 +686,7 @@ a:hover{ cursor: pointer; }
 
 <style>
 #wallPaperCon .el-dialog__body{
-    padding: 20px;
+    padding: 10px;
 }
 #shopsCon .el-table__expand-icon::after{
     display: none;

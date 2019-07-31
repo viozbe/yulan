@@ -63,6 +63,7 @@
                 </el-table-column>
                 <el-table-column
                 prop="payerAccount"
+                width="160"
                 label="付款账号"
                 align="center">
                 </el-table-column>

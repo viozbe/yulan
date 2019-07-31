@@ -351,16 +351,6 @@ import DetailCurtainTable from '../detail/detailCurtainTable'
       },
     //退回修改
     _back(){
-      /* this.$confirm('确定退回让用户进行修改', '提示', {
-                confirmButtonText: '是',
-                cancelButtonText: '否',
-                type: 'warning'
-                }).then(() => {
-                  console.log('退回成功');
-                  //跳转
-                }).catch(() => {     
-                  console.log('失败')
-            }); */
       let url = '/order/updateCurtainOrder.do';
       let data = {
         orderNo:this.orderNumber,
@@ -368,21 +358,33 @@ import DetailCurtainTable from '../detail/detailCurtainTable'
         allCurtains:[],
         ctmOrderDetails:this.ctmOrderDetails
       };
-      for(let j=0;j<this.ruleForm.ORDERBODY.length;j++){
+      console.log(this.allCurtains);
+      console.log(this.ruleForm.ORDERBODY);
+      for(let j=0;j<this.allCurtains.length;j++){
+        let array = new Array;
+          for(let i=0;i<this.allCurtains[j].length;i++){
+            array[i] = new Object;
+            array[i].suggestion=this.allCurtains[j][i].suggestion;
+            array[i].lineNo=this.allCurtains[j][i].lineNo;
+            array[i].orderItemNumber=this.allCurtains[j][i].orderItemNumber;
+            array[i].orderNo=this.orderNumber;
+          }
+          data.allCurtains.push(array);
+      }
+      /* for(let j=0;j<this.ruleForm.ORDERBODY.length;j++){
         let array = new Array();
         for(let i=0;i<this.ruleForm.ORDERBODY[j].curtains.length;i++){
           array[i] = new Object;
           //array[i].suggestion=this.ruleForm.ORDERBODY[j].curtains[i].suggestion;
-          array[i].suggestion=this.allCurtains[j][i].suggestion;
+          //array[i].suggestion=this.allCurtains[j][i].suggestion;
           array[i].lineNo=this.ruleForm.ORDERBODY[j].curtains[i].lineNo;
           array[i].orderItemNumber=this.ruleForm.ORDERBODY[j].curtains[i].orderItemNumber;
           array[i].orderNo=this.orderNumber;
         }
-        //console.log(array);
         data.allCurtains.push(array);
-      }
+      } */
       console.log(data.allCurtains);
-      console.log(data);
+      // console.log(data);
       defeatChange(url,data).then(res =>{
         console.log(res);
         if(res.code==0){

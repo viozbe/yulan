@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'babel-polyfill'
 import Axios from 'axios'
 import { get, post, patch, put} from './api/http'
 import qs from 'qs'

@@ -59,15 +59,24 @@ const router = new Router({
       children: [{
         path: '/shops/curtain',
         name: 'curtain',
-        component: Curtain
+        component: Curtain,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/shops/wallPaper',
         name: 'wallPaper',
-        component: WallPaper
+        component: WallPaper,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/shops/softSuit',
         name: 'softSuit',
-        component: SoftSuit
+        component: SoftSuit,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/shops/shoppingCurtainDetail',
         name: 'shoppingCurtainDetail',
@@ -99,7 +108,10 @@ const router = new Router({
       },{
         path: '/refundCompensation',
         name: 'refundCompensation',
-        component: RefundCompensation
+        component: RefundCompensation,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/detail/detailRefund',
         name: 'detailRefund',
@@ -107,7 +119,7 @@ const router = new Router({
       },{
         path: '/statement',
         name: 'statement',
-        component: Statement
+        component: Statement,
       },{
         path: '/shoppingCar/shopping',
         name: 'shopping',
@@ -127,7 +139,10 @@ const router = new Router({
       },{
         path: '/order/myOrder',
         name: 'myOrder',
-        component: MyOrder
+        component: MyOrder,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/design/imageShop',
         name: 'imageShop',
@@ -151,7 +166,10 @@ const router = new Router({
       },{
         path: '/order/examine',
         name: 'examine',
-        component: examine
+        component: examine,
+        meta:{
+          keepAlive: true
+        }
       },{
         path: '/order/examineDetail',
         name: 'examineDetail',
@@ -188,6 +206,7 @@ const router = new Router({
 import Cookies from 'js-cookie'
 //路由守卫
 router.beforeEach( (to, from, next) => {
+  console.log(to.meta.keepAlive)
   if ( !Cookies.get('cid') && !Cookies.get('customerType') && to.name != 'login') {
     next('/login')
   } else {

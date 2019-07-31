@@ -141,6 +141,7 @@
                         </table>
 
                         <el-table
+                            height="500"
                             :data="tableDetail"
                             :summary-method="getSummaries"
                             show-summary

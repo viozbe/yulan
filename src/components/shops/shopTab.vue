@@ -139,7 +139,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog title="商品库存" :visible.sync="dialogTableVisible" width="550px">
+        <el-dialog border title="库存查询" :visible.sync="dialogTableVisible" width="550px">
             <el-table id="storeTable" :data="produceStore" :row-style="rowClass">
                 <el-table-column property="header" min-width="30%"></el-table-column>
                 <el-table-column property="body" style="width: 70%;"></el-table-column>

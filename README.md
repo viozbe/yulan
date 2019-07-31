@@ -1,5 +1,8 @@
 # yulan
 
+> 打印插件依赖下载
+> npm install print-js --save
+
 > A Vue.js project
 
 ## Build Setup

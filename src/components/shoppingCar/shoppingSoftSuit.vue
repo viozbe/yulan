@@ -117,6 +117,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
+                <br>
             </template>
         </el-table-column>
         <el-table-column>
@@ -688,6 +689,9 @@ export default {
 </script>
 
 <style>
+#shoppingCarCon{
+    margin-top: -32px;
+}
 #shoppingCarCon .el-table .colorType_0{
     background: oldlace;
 }

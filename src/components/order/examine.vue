@@ -338,7 +338,10 @@ export default {
       // this.$router.push({
       //   name:`myOrder`
       // });
-    }
+    },
+    activated:function(){
+      this.getorderList();
+    },
 }
 </script>
 

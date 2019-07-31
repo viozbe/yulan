@@ -47,7 +47,7 @@
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card v-for="(item,index) of data" :key="index">
+      <el-card style="position:relative;" v-for="(item,index) of data" :key="index">
         <div slot="header">
           <span class="zoomLeft">时间：</span>
           <span class="zoomRight">{{item.DATE_CRE}}</span>
@@ -71,20 +71,17 @@
               @click="deleteOrder(item.ORDER_NO)"
             ></i>
           </el-tooltip>
-          <!-- 投诉 -->
-          <!-- <el-tooltip class="item" effect="dark" content="我要投诉" placement="left">
-        <i @click="addTab('order/mycomplaint')" v-show="item.complaint" style="float:right;cursor: pointer;" class="el-icon-tickets"></i>  
-          </el-tooltip><br>-->
         </div>
 
         <div class="outDiv" style="float:left;width:90%">
           <el-table
+            border
             :data="data[index].ORDERBODY"
             style="width: 100%"
             :row-class-name="tableRowClassName"
           >
-            <el-table-column prop="ITEM_NO" label="型号" align="center"></el-table-column>
-            <el-table-column prop="BRAND_NAME" label="品牌" align="center"></el-table-column>
+            <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
+            <el-table-column prop="BRAND_NAME" label="品牌" align="center" width="150"></el-table-column>
             <el-table-column prop="NOTE" label="类型" align="center"></el-table-column>
             <el-table-column label="数量" align="center" width="150">
               <template slot-scope="scope1">
@@ -112,7 +109,7 @@
                 <!-- <span v-else>{{scope1.row.UNIT_PRICE*scope1.row.QTY_REQUIRED | priceFilter}}</span> -->
               </template>
             </el-table-column>
-            <el-table-column align="center" label="出货详情">
+            <el-table-column width="150" align="center" label="出货详情">
               <template slot-scope="scope">
                 <el-button
                   :disabled="scope.row.packDetailId==0?true:false"
@@ -134,12 +131,9 @@
                 @click="toOrderDetail(item.ORDER_NO,item.STATUS_ID)"
                 size="medium"
                 type="success"
-                plain
               >订单详情</el-button>
             </p>
           </router-link>
-          <!--   <p v-if="buttonShow"><el-button  @click="payment(item.logistics)" size="medium" type="danger">马上付款</el-button></p> -->
-          <!--   <p v-else><el-button  size="medium" type="primary" plain>再次购买</el-button></p>  -->
           <router-link to="/order/checkOrder">
             <p>
               <el-button
@@ -161,7 +155,6 @@
               >审核详情</el-button>
             </p>
           </router-link>
-          <!-- <p><el-button v-if="item.CURTAIN_STATUS_ID=='2'" @click="_pass(item.ORDER_NO)" size="medium" type="success">确认订单</el-button></p> -->
         </div>
       </el-card>
       <div style="margin:0 25%;" class="block">
@@ -189,75 +182,7 @@ export default {
   data() {
     return {
       isManager: Cookies.get("isManager"),
-      data: [
-        /* {
-            WEB_TJ_TIME:' 2019-1-29 13:00:00 ',
-            ORDER_NO:'W1610030066',
-            WL_CONTACTS:'测试乙',
-            POST_ADDRESS:'广东省广州市番禺区大学城小谷围广东工业大学',
-            WL_TEL:'15551551551',
-            status:'待收货',
-            complaint:true,
-            ORDERBODY: [
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },]
-            },
-            {
-            WEB_TJ_TIME:' 2019-1-29 13:00:11 ',
-            ORDER_NO:'W1610030066',
-            WL_CONTACTS:'测试乙',
-            POST_ADDRESS:'广东省广州市番禺区大学城小谷围广东工业大学',
-            WL_TEL:'15551551551',
-            status:'已收货',
-            complaint:false,
-            ORDERBODY: [
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },],} */
-      ],
+      data: [],
       date1: "",
       date2: "",
       find: "",
@@ -284,6 +209,9 @@ export default {
       ],
       detailShow: true
     };
+  },
+  activated:function(){
+    this.refresh();
   },
   filters: {
     transStatus(value) {
@@ -386,48 +314,11 @@ export default {
     },
     //订单详情
     toOrderDetail(val, status) {
-      console.log(val);
-      console.log(status);
-      //this.find=val;
       Cookies.set("ORDER_NO", val);
       Cookies.set("status_ID", status);
       console.log(Cookies.get("ORDER_NO"));
       console.log(Cookies.get("status_ID"));
       this.addTab("order/orderDetail");
-
-      //console.log(Cookies.get('ORDER_NO'));
-      //this.refresh();
-    },
-    _pass(orderNo) {
-      console.log(orderNo);
-      var url = "/order/updateCurOrderStatus.do";
-      var data = {
-        orderNo: orderNo,
-        curtainStatusId: "4"
-      };
-      this.$confirm("确认同意兰居修改通过审核？", "提示", {
-        confirmButtonText: "是",
-        cancelButtonText: "否",
-        type: "info"
-      }).then(() => {
-        passExamine(url, data).then(res => {
-          console.log(res);
-          if (res.code == 0) {
-            this.$alert("操作成功,改订单已经通过审核", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            }).then(() => {
-              //this.handleClick('90');
-              this.refresh();
-            });
-          } else {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning"
-            });
-          }
-        });
-      });
     },
     //订单获取
     refresh() {
@@ -456,11 +347,6 @@ export default {
         this.data = res.data;
         console.log(this.data);
       });
-    },
-    //补充付款  [不用先]
-    payment(val) {
-      console.log(val);
-      this.addTab("order/payment");
     },
     //出货详情
     shipmentDetail(tab) {
@@ -551,7 +437,6 @@ export default {
   //生命周期
   created() {
     this.refresh();
-    //this.closeTab('order/checkOrder');
     console.log(Cookies.get("cid"));
     // this.$router.push({
     //   name:`myOrder`
@@ -565,10 +450,6 @@ export default {
   margin: 0 auto;
   position: relative;
 }
-/* .childCard{
-    width: 40%;
-    float: left;
-} */
 .zoomLeft {
   font-size: 15px;
   font-weight: bold;
@@ -580,6 +461,10 @@ p {
 .buttonDiv {
   float: right;
   width: 8%;
+  /* position: absolute;
+  top: 50%;
+  left: 90%;
+  width: 8%; */
 }
 .zoomRight {
   font-weight: 400;
@@ -591,7 +476,9 @@ p {
   background: #f0f9eb;
 }
 .el-table .fuck-row {
-  background: #bac5b3;
+  background: #f0f9eb;
+  color:tomato;
+  text-decoration: line-through;
 }
 #outDiv .el-card__header {
   padding: 12px 20px;
@@ -600,6 +487,7 @@ p {
   padding: 5px 10px;
 }
 #outDiv .el-card {
+  padding-bottom:10px; 
   margin-bottom: 15px;
 }
 </style>

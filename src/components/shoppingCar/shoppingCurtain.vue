@@ -607,6 +607,9 @@ export default {
 }
 </script>
 <style>
+#shoppingCurtain{
+    margin-top: -32px;
+}
 #shoppingCurtain .el-table .colorType_0{
     background: oldlace;
 }

@@ -12,7 +12,7 @@
                 :data="curtainData"
                 :span-method="cellMerge">
                 <el-table-column
-                    min-width="140"
+                    width="170"
                     label="商品信息">
                     <template>
                         <div class="messageBox">
@@ -48,7 +48,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="名称"
-                    width="70">
+                    width="60">
                     <template slot-scope="scope">
                         {{getTypeName(scope.row.itemType)}}
                         <br>
@@ -124,7 +124,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="名称">
+                <el-table-column label="名称" width="100">
                     <template slot-scope="scope">
                         <div v-if="scope.row.note !== null">{{scope.row.note}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
@@ -138,6 +138,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="面料属性"
+                    width="100"
                     align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.fixType !== '' && scope.row.fixType !== null && scope.row.productType === 'ML'">
@@ -159,7 +160,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="用量"
-                    width="100">
+                    width="90">
                     <template slot-scope="scope">
                         <span v-if="scope.row.itemType === 'lspb'"></span>
                         <span v-else-if="scope.row.modifyFlag === 'Y'">
@@ -211,7 +212,7 @@
                         </div> -->
                     </template>
                 </el-table-column>
-                <el-table-column label="说明">
+                <el-table-column label="说明" width="80">
                     <template slot-scope="scope">
                         <span style="color:red;">
                             {{scope.row.tip}}
@@ -222,7 +223,8 @@
                 <el-table-column label="备注">
                     <template slot-scope="scope">
                         <el-input
-                            size="mini"
+                            type="textarea"
+                            :autosize="{ maxRows: 6 }"
                             v-model="scope.row.remark"
                             clearable>
                         </el-input>
