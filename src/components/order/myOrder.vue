@@ -350,14 +350,12 @@ export default {
     },
     //出货详情
     shipmentDetail(tab) {
-      console.log(tab.ORDER_NO);
-      console.log(tab.ITEM_NO);
-      //console.log(orderNum);
       this.$router.push({
         name: `shipment`,
         params: {
           itemNo: tab.ITEM_NO,
-          orderId: tab.ORDER_NO
+          orderId: tab.ORDER_NO,
+          lineNo:tab.LINE_NO
         }
       });
       this.addTab("order/shipment");

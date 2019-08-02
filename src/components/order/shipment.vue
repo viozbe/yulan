@@ -124,6 +124,7 @@ import { mapState } from 'vuex'
            }],
         saleNo: '',
         dingdanhao:'',
+        lineNo:'',
         zongshuliang:'',
         daifashuliang:'',
         kuaidi100:'',
@@ -159,10 +160,13 @@ import { mapState } from 'vuex'
       init_shipment(){
         this.dingdanhao=this.$route.params.orderId;
         this.saleNo=this.$route.params.itemNo;
+        this.lineNo=this.$route.params.lineNo;
+        
 
             Axios.post('/packDetail/getPackDetailAppoint.do', {
               "itemNo":this.saleNo,
-              "orderId":this.dingdanhao
+              "orderId":this.dingdanhao,
+              "lineNo":this.lineNo
             })
             .then((res) =>{
               console.log(res);

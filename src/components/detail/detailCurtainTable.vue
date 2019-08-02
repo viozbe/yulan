@@ -75,7 +75,11 @@
                                 {{scope.row.item.itemNo}}
                             </span>
                             <span v-else-if="(scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y')">
-                                <el-select size="mini" v-model="scope.row.item.itemNo" placeholder="请选择">
+                                <el-select 
+                                    size="mini" 
+                                    v-model="scope.row.item.itemNo" 
+                                    placeholder="请选择"
+                                    @change="changePJBUnit(scope.$index)">
                                     <el-option
                                         v-for="item in part2"
                                         :key="item.value"
@@ -445,6 +449,7 @@ export default {
             itemNo: '',                     //选中的编码
             //接口获取到的全部数据
             allData: {},
+            data: [],                       //表格数据
             compareData: [],                //对比数据
             oldData: [],                    //保留最原始数据
             //窗帘大类状态
@@ -509,6 +514,16 @@ export default {
     },
     props: ['headerData','curtainData','tableStatus','suggestion','isModified'],
     methods:{
+        //修改配件包时，对应修改单位
+        changePJBUnit(index){
+            let _data = this.data[index].item.itemNo
+            this.part2.forEach(item =>{
+                if(item.value === _data){
+                    this.data[index].unit = item.unit
+                    return
+                }
+            })
+        },
         //大类和二类的联动
         changeLink(type,index){
             for(let i = 0; i < this.data.length; i++){
@@ -643,6 +658,7 @@ export default {
                     return;
                 }
             }
+            console.log(_data)
             this.$emit('visible',false);
             this.$emit('finalData',_data);
             this.$emit('suggest',this.suggestion);
@@ -763,7 +779,14 @@ export default {
             });
             this.data[this.chooseIndex].curtainItemName = data.note;
             this.data[this.chooseIndex].specification = data.fixGrade/1000;
+            console.log(this.data[this.chooseIndex],this.curtainData[this.chooseIndex])
             let theFixType;
+            if(this.data[this.chooseIndex].itemType === 'lspb'){
+                this.data[this.chooseIndex].certainHeightWidth = null
+                this.data[this.chooseIndex].item.itemNo = this.itemNo
+                this.judgeTip(this.data[this.chooseIndex],this.chooseIndex)
+                return
+            }
             if(data.fixType === '01'){
                 theFixType = 1;
             }
@@ -772,7 +795,7 @@ export default {
             }
             this.data[this.chooseIndex].certainHeightWidth = theFixType;
             this.curtainData[this.chooseIndex].certainHeightWidth = theFixType;
-            if(!status1){
+            if(!status1 && this.data[this.chooseIndex].itemType !== 'lspb'){
                 //修改用量
                 let _headerData = this.headerData;
                 let index = this.chooseIndex;
@@ -815,6 +838,7 @@ export default {
                         this.updateDosage(_data.itemType,keys);
                     }
                     this.data[this.chooseIndex].item.itemNo = this.itemNo;
+                    console.log(this.data[this.chooseIndex],this.curtainData[this.chooseIndex])
                     this.judgeTip(this.data[this.chooseIndex],this.chooseIndex);
                 }).catch(err =>{
                     console.log(err);
@@ -822,6 +846,7 @@ export default {
             }
             else if(status1){
                 this.data[this.chooseIndex].item.itemNo = this.itemNo;
+                console.log(this.data[this.chooseIndex],this.curtainData[this.chooseIndex])
                 this.judgeTip(this.data[this.chooseIndex],this.chooseIndex);
                 if(this.data[this.chooseIndex].item.itemNo === 'GY-003'){
                     this.data[this.chooseIndex].dosage = this.curtainData[this.chooseIndex].dosage;
@@ -1065,7 +1090,7 @@ export default {
                 }
             }
             if(columnIndex === 2){
-                if(row.itemType === 'pjb' && row.changeFlag === 'Y'){
+                if(row.itemType === 'pjb' && row.changeFlag === 'Y' && this.tableStatus !== 3){
                     return {
                         rowspan: 1,
                         colspan: 2
@@ -1073,7 +1098,7 @@ export default {
                 }
             }
             if(columnIndex === 3){
-                if(row.itemType === 'pjb' && row.changeFlag === 'Y'){
+                if(row.itemType === 'pjb' && row.changeFlag === 'Y' && this.tableStatus !== 3){
                     return {
                         rowspan: 1,
                         colspan: 0
@@ -1275,7 +1300,6 @@ export default {
         },
         //获取原对比数据
         getOldData(data){
-            //return ;
             this.compareData = JSON.parse(JSON.stringify(this.curtainData));
             this.part2 = [];
             let _obj = {
@@ -1288,7 +1312,8 @@ export default {
                 res.data.forEach(item =>{
                     _arr.push({
                         label: `${item.itemNo}:${item.note}`,
-                        value: item.itemNo
+                        value: item.itemNo,
+                        unit: (item.unit === '°ü')?'包':item.unit
                     })
                 })
                 _arr.sort(function(a , b){
@@ -1352,16 +1377,10 @@ export default {
         }
     },
     computed:{
-        data(){
-            return JSON.parse(JSON.stringify(this.curtainData));
-            // let arr = [];
-            // for(let i = 0; i < this.curtainData.length; i++){
-            //     for(let j = 0; j < this.curtainData[i].curtainCommodities.length; j++){
-            //         arr.push(this.curtainData[i].curtainCommodities[j])
-            //     }
-            // }
-            // return arr;
-        }
+        // data(){
+        //     console.log(1,this.curtainData)
+        //     return JSON.parse(JSON.stringify(this.curtainData));
+        // }
     },
     activated: function(){
         //按规则排序
@@ -1369,6 +1388,7 @@ export default {
             let rule = ['lt','ls','lspb','sha','pjb']
             return  rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
         })
+        this.data = JSON.parse(JSON.stringify(this.curtainData))
         this.oldData = JSON.parse(JSON.stringify(this.curtainData));
         console.log(this.headerData,this.data,this.curtainData);
         this.getOldData(this.headerData);

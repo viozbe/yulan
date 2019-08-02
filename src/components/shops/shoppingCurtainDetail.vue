@@ -1,13 +1,9 @@
 <template>
     <div>
         <el-card shadow="hover">
-            <!-- <div slot="header">
-                <span class="fstrong f16">修改商品信息：</span>
-            </div> -->
             <div class="mb10">
                 <p class="fstrong f16">商品信息：</p>
             </div>
-            <!-- <span style="color: red;" class="f12 mt5">(带单选框表示可要可不要)</span> -->
             <el-table style="width:100%;" border
                 :data="curtainData"
                 :span-method="cellMerge">
@@ -72,7 +68,11 @@
                     <template slot-scope="scope">
                         <div>
                             <span v-if="(scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y')">
-                                <el-select size="mini" v-model="scope.row.itemNo" placeholder="请选择">
+                                <el-select 
+                                    size="mini" 
+                                    v-model="scope.row.itemNo"
+                                    placeholder="请选择"
+                                    @change="changePJBUnit(scope.$index)">
                                     <el-option
                                         v-for="item in part2"
                                         :key="item.value"
@@ -429,6 +429,16 @@ export default {
         }
     },
     methods:{
+        //修改配件包时，对应修改单位
+        changePJBUnit(index){
+            let _data = this.curtainData[index].itemNo
+            this.part2.forEach(item =>{
+                if(item.value === _data){
+                    this.curtainData[index].unit = item.unit
+                    return
+                }
+            })
+        },
         //大类和二类的联动
         changeLink(type,index){
             for(let i = 0; i < this.curtainData.length; i++){
@@ -495,7 +505,8 @@ export default {
                 res.data.forEach(item =>{
                     _arr.push({
                         label: `${item.itemNo}:${item.note}`,
-                        value: item.itemNo
+                        value: item.itemNo,
+                        unit: (item.unit === '°ü')?'包':item.unit
                     })
                 })
                 _arr.sort(function(a , b){
@@ -679,12 +690,18 @@ export default {
                 if(v.itemNo === this.itemNo)
                     return v;
             });
+            let status2 = (data.fixType === null||this.curtainData[this.chooseIndex].itemType === 'lspb')
             this.curtainData[this.chooseIndex].note = data.note;
             this.curtainData[this.chooseIndex].fixGrade = data.fixGrade;
-            this.curtainData[this.chooseIndex].fixType = (data.fixType === null)?'':data.fixType;
-            this.allData.itemList[this.chooseIndex].fixType = (data.fixType === null)?'':data.fixType;
+            this.curtainData[this.chooseIndex].fixType = (status2)?'':data.fixType;
+            this.allData.itemList[this.chooseIndex].fixType = (status2)?'':data.fixType;
             //非工艺修改用量
             if(!status1){
+                if(this.curtainData[this.chooseIndex].itemType === 'lspb'){
+                    this.curtainData[this.chooseIndex].itemNo = this.itemNo;
+                    this.judgeTip(this.curtainData[this.chooseIndex],this.chooseIndex);
+                    return
+                }
                 //修改用量
                 let obj = {
                     width: this.message.width,

@@ -27,7 +27,7 @@
 
 
   <div slot="header">
-    <span class="headSpan">审核详情</span>
+    <span class="headSpan">订单详情</span>
     <el-button @click="backTowhere()" style="float:right;" size="small"  type="success" plain>返回</el-button>
   </div>
     <el-card class="tableCard" shadow="hover">
