@@ -6,6 +6,7 @@
                 :span-method="cellMerge">
                 <el-table-column
                     width="170"
+                    header-align="center"
                     label="商品信息">
                     <template>
                         <div class="messageBox">
@@ -46,6 +47,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="名称"
+                    header-align="center"
                     width="60">
                     <template slot-scope="scope">
                         {{getTypeName(scope.row.curtainPartName)}}
@@ -68,6 +70,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="编码"
+                    header-align="center"
                     width="130">
                     <template slot-scope="scope">
                         <div>
@@ -131,21 +134,25 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="名称" width="100">
+                <el-table-column label="名称" 
+                    header-align="center"
+                    width="100">
                     <template slot-scope="scope">
                         <div v-if="scope.row.curtainItemName !== null">{{scope.row.curtainItemName}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="规格:米/对"
-                    width="60"
-                    align="center">
+                    header-align="center"
+                    align="center"
+                    width="60">
                     <template slot-scope="scope">
                         {{(scope.row.specification===0 || scope.row.specification === null)?'--':scope.row.specification}}
                     </template>
                 </el-table-column>
                 <el-table-column label="面料属性"
                     width="100"
+                    header-align="center"
                     align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.certainHeightWidth !== null && scope.row.productType === 'ML'">
@@ -167,7 +174,8 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="用量"
-                    width="110">
+                    width="90"
+                    header-align="center">
                     <template slot-scope="scope">
                         <span v-if="tableStatus === 3">
                             {{scope.row.dosage|dosageFilter}}
@@ -198,15 +206,27 @@
                 </el-table-column>
                 <el-table-column label="制造说明"
                     width="130"
+                    header-align="center"
                     align="center">
                     <template slot-scope="scope">
                         <div v-if="tableStatus === 3">
                             {{scope.row.manufacturingInstructions}}
                         </div>
+                        <div v-else-if="scope.row.productType === 'XHB'"></div>
                         <div v-else-if="scope.row.itemType === 'lt'">
                             <el-select size="mini" v-model="scope.row.manufacturingInstructions" placeholder="--未选--">
                                 <el-option
                                     v-for="item in part0"
+                                    :key="item.value"
+                                    :label="item.value"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </div>
+                        <div v-else-if="scope.row.itemType === 'lspb'">
+                            <el-select size="mini" v-model="scope.row.manufacturingInstructions" placeholder="--未选--">
+                                <el-option
+                                    v-for="item in part3"
                                     :key="item.value"
                                     :label="item.value"
                                     :value="item.value">
@@ -235,7 +255,9 @@
                         </div> -->
                     </template>
                 </el-table-column>
-                <el-table-column label="说明" width="80">
+                <el-table-column label="说明" 
+                    header-align="center"
+                    width="80">
                     <template slot-scope="scope">
                         <span style="color:red;">
                             {{scope.row.illustrate}}
@@ -243,7 +265,8 @@
                         </span>
                     </template>
                 </el-table-column>
-                <el-table-column label="备注">
+                <el-table-column label="备注"
+                    header-align="center">
                     <template slot-scope="scope">
                         <el-input
                             :autosize="{ maxRows: 6 }"
@@ -256,6 +279,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="兰居意见"
+                    header-align="center"
                     v-if="tableStatus !== 0">
                     <template slot-scope="scope">
                         <el-input v-if="tableStatus === 1"
@@ -479,6 +503,15 @@ export default {
                 { value: '对开' },
                 { value: '单开' },
                 { value: '特殊开备注' },
+            ],
+            //帘身配布制造说明
+            part3:[
+                { value: '一个褶' },
+                { value: '一个半褶' },
+                { value: '二个褶' },
+                { value: '二个半褶' },
+                { value: '三个褶' },
+                { value: '三个半褶' }
             ],
             //配件编码
             part2: [
@@ -1147,7 +1180,7 @@ export default {
                         }
                     }
                 }
-                if(_itemType === 'lt' && _manufacturingInstructions === ''){
+                if(_itemType === 'lt' && _curtainData[i].productType !== 'XHB' && _manufacturingInstructions === ''){
                     this.$alert('制造说明不能为空', '提示', {
                         confirmButtonText: '好的',
                         type: 'warning'
