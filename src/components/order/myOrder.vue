@@ -480,12 +480,14 @@ p {
 }
 #outDiv .el-card__header {
   padding: 12px 20px;
+  background-color: rgb(245, 245, 245);
 }
 #outDiv .el-card__body {
   padding: 5px 10px;
 }
 #outDiv .el-card {
-  padding-bottom:10px; 
-  margin-bottom: 15px;
+  padding-bottom:5px; 
+  margin-bottom: 5px;
+  border: 1px solid rgb(140, 214, 198);
 }
 </style>
