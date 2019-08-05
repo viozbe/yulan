@@ -51,10 +51,17 @@
                 </el-table-column>
                 <el-table-column
                 label="创建时间"
+                width="180"
                 align="center">
                     <template slot-scope="scope">
                         <span>{{scope.row.createTs | datatrans}}</span>
                     </template>
+                </el-table-column>
+                <el-table-column
+                prop="cname"
+                width="180"
+                label="客户名称"
+                align="center">
                 </el-table-column>
                 <el-table-column
                 prop="customerAgent"
@@ -63,7 +70,7 @@
                 </el-table-column>
                 <el-table-column
                 prop="officeTel"
-                width="220"
+                width="200"
                 label="联系电话"
                 align="center">
                 </el-table-column>
@@ -345,9 +352,9 @@
         </el-dialog>
         <el-dialog
             title="查看图片"
-            width="650px"
+            :width="DiaWidth"
             :visible.sync="BigPic">
-            <img class="BIGimg" :src="BIGimgPath">
+            <img :style="ImgStyle" ref="box" :src="BIGimgPath" @load="picLoad">
         </el-dialog>
     </div>
     
@@ -365,21 +372,11 @@ export default {
     name: 'BankProof',
     data(){
         return{
+            DiaWidth:'',
+            ImgStyle:{},
             lookORedit:false,
             agree:false,
             abdrImage:[
-              /* {
-                  "imageIndex": 1,//图片序号
-                  "specifications": "test",//规格
-                  "memo": "test", //定制要求
-                  "imagePath": "http://14.29.223.114:10250/upload/paymentBill-image/381262be-ffc2-4e2d-815a-3558e036e5cc-9440653361599200.jpeg" //图片路径
-              },
-              {
-                  "imageIndex": 1,//图片序号
-                  "specifications": "test",//规格
-                  "memo": "test", //定制要求
-                  "imagePath": "http://14.29.223.114:10250/upload/paymentBill-image/856998b6-8000-4b2f-ac18-64d5d5ab9196-9483061054880600.jpeg" //图片路径
-              }, */
             ],
             BigPic:false,
             BIGimgPath:'',
@@ -472,6 +469,23 @@ export default {
         },
     },
     methods:{
+    picLoad(){
+      // let heightStyle = this.$refs.box;
+      // let theHeight = window.getComputedStyle(this.$refs.box).height;
+      let theHeight = this.$refs.box.offsetHeight;
+      let theWidth = this.$refs.box.offsetWidth;
+      let theBit = 0.8;
+      if(theHeight<600||theWidth<600){
+        this.ImgStyle.width = theWidth+'px';
+        this.ImgStyle.height = theHeight+'px';
+        this.DiaWidth = theWidth+50+'px'
+      }
+      else{
+        this.ImgStyle.width = theWidth*theBit+'px';
+        this.ImgStyle.height = theHeight*theBit+'px';
+        this.DiaWidth = theWidth*theBit+50 +'px'
+      }
+    },
     //提交
     _changeStatus(id){
       if(this.abdrImage.length===0){
