@@ -444,6 +444,15 @@ export default {
         }
         this.searchRefund()
     },
+    activated:function(){
+        if(this.identity === 'USER'){
+            this.initDate()
+        }
+        else if(this.identity === 'ECWEB'){
+            this.initBadge()
+        }
+        this.searchRefund()
+    },
     filters:{
         //过滤掉值为空的属性
         propertyFilter(obj){
