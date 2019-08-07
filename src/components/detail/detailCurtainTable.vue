@@ -493,8 +493,8 @@ export default {
             part: [],
             //帘头制造说明
             part0: [
-                { value: '幺术贴正车' },
-                { value: '幺术贴反车' },
+                { value: '么术贴正车' },
+                { value: '么术贴反车' },
                 { value: '穿/挂杆款' },
                 { value: '特殊见备注' }
             ],
