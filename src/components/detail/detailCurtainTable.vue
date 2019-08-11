@@ -174,7 +174,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="用量"
-                    width="90"
+                    width="95"
                     header-align="center">
                     <template slot-scope="scope">
                         <span v-if="tableStatus === 3">
@@ -547,12 +547,14 @@ export default {
     },
     props: ['headerData','curtainData','tableStatus','suggestion','isModified'],
     methods:{
-        //修改配件包时，对应修改单位
+        //修改配件包时，对应修改单位以及名称说明
         changePJBUnit(index){
             let _data = this.data[index].item.itemNo
             this.part2.forEach(item =>{
                 if(item.value === _data){
                     this.data[index].unit = item.unit
+                    this.data[index].curtainItemName = item.note
+                    this.judgeTip(this.data[index],index)
                     return
                 }
             })
@@ -828,6 +830,7 @@ export default {
             }
             this.data[this.chooseIndex].certainHeightWidth = theFixType;
             this.curtainData[this.chooseIndex].certainHeightWidth = theFixType;
+            this.compareData[this.chooseIndex].certainHeightWidth = theFixType;
             if(!status1 && this.data[this.chooseIndex].itemType !== 'lspb'){
                 //修改用量
                 let _headerData = this.headerData;
@@ -1046,6 +1049,10 @@ export default {
                 else if(status === 2)   status = 5;
                 else    status = 3;
             }
+            if(data.itemType === 'pjb'){
+                if(data.item.itemNo !== this.compareData[index].item.itemNo)    status = 3
+                else status = -1
+            }
             switch(status){
                 case 1:
                     this.data[index].illustrate = '修改为定高';
@@ -1063,7 +1070,7 @@ export default {
                     this.data[index].illustrate = '修改为定宽，非标配';
                     break;
                 default:
-                    this.data[index].illustrate = null;
+                    this.data[index].illustrate = ' ';
             }
             //return this.curtainData[index].tip;
         },
@@ -1346,13 +1353,14 @@ export default {
                     _arr.push({
                         label: `${item.itemNo}:${item.note}`,
                         value: item.itemNo,
-                        unit: (item.unit === '°ü')?'包':item.unit
+                        unit: (item.unit === '°ü')?'包':item.unit,
+                        note: item.note
                     })
                 })
                 _arr.sort(function(a , b){
                     return (a.value>b.value)?1:-1   //升序
                 })
-                _arr.push({ label: '-未选择配件包-', value: null })
+                _arr.push({ label: '-未选择配件包-', value: null, unit: '', note: '' })
                 this.part2 = _arr
             }).catch(err =>{
                 this.part2 = []

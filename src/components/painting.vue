@@ -93,9 +93,9 @@
 
         <el-dialog
             title="查看图片"
-            width="650px"
+            :width="DiaWidth"
             :visible.sync="BigPic">
-            <img class="BIGimg" :src="BIGimgPath">
+            <img :style="ImgStyle" ref="box" :src="BIGimgPath" @load="picLoad">
         </el-dialog>
         <!-- 大表 -->
         <el-dialog
@@ -207,6 +207,8 @@ export default {
     name: 'BankProof',
     data(){
         return{
+            DiaWidth:'',
+            ImgStyle:{},
             BIGimgPath:'',
             BigPic:false,
             abdrImage:[
@@ -292,6 +294,24 @@ export default {
         },
     },
     methods:{
+    picLoad(){
+      // let heightStyle = this.$refs.box;
+      // let theHeight = window.getComputedStyle(this.$refs.box).height;
+      let theHeight = this.$refs.box.offsetHeight;
+      let theWidth = this.$refs.box.offsetWidth;
+      let theBit = 0.8;
+      if(theHeight<600||theWidth<600){
+        this.ImgStyle.width = theWidth+'px';
+        this.ImgStyle.height = theHeight+'px';
+        this.DiaWidth = theWidth+50+'px'
+      }
+      else{
+        this.ImgStyle.width = theWidth*theBit+'px';
+        this.ImgStyle.height = theHeight*theBit+'px';
+        this.DiaWidth = theWidth*theBit+50 +'px'
+      }
+      console.log('加载完毕')
+    },
     //角标更新
     IconReflash(){
       let IconNum =0;
@@ -346,7 +366,6 @@ export default {
         else{
             this.agree = false;
         }
-        this.PaintingDia = true ;
         console.log(tab);
         this.tableData = tab;
         if(tab.abdrImage.length){
@@ -360,6 +379,7 @@ export default {
           }
         }
         this.abdrImage = tab.abdrImage; 
+        this.PaintingDia = true ;
     },
     //查询
     search(){

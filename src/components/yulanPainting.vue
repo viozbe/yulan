@@ -633,7 +633,6 @@ export default {
         this.agree = false;
       }
         this.abdrImage = [];
-        this.lookDia = true ;
         console.log(tab);
         this.tableData = tab;
         this.lookORedit = true; 
@@ -648,6 +647,7 @@ export default {
           }
         }
         this.abdrImage = tab.abdrImage; 
+        this.lookDia = true ;
     },
     editIt(tab){
         if(tab.state=="ONCREATE"){
