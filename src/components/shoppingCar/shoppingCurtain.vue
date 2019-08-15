@@ -522,6 +522,7 @@ export default {
                 let _outHeightChoose = val[i].outsourcingBoxExist;
                 let _wbh = val[i].outsourcingBoxWidth;
                 let _order = {
+                    flagFlType: (val[i].salPromotion === null)?'':val[i].salPromotion.falgFl,//新增活动字段
                     itemNo: val[i].modelNumber,//型号
                     itemNoSample: (_itemNoSample === null)?val[i].modelNumber:_itemNoSample,//样本型号
                     partSendId: '0',//分批发货标志，0不可以，1可以

@@ -142,45 +142,7 @@ export default {
         WL_TEL: "",
         POST_ADDRESS: "",
         NOTES: "",
-        ORDERBODY: [
-          /* {
-            ITEM_NO: 'NPP006911',
-            ITEM_NO_SAMPLE: '111',
-            NOTE: '墙画',
-            PRODUCTION_VERSION:'新墙标(大)',
-            QTY_REQUIRED:'大1卷',
-            PROMOTION:'团购订单',
-            PART_SEND_ID:'是',
-            NOTES:'无',
-            }, {
-            ITEM_NO: 'NPP006911',
-            ITEM_NO_SAMPLE: '111',
-            NOTE: '墙画',
-            PRODUCTION_VERSION:'新墙标(大)',
-            QTY_REQUIRED:'大1卷',
-            PROMOTION:'团购订单',
-            PART_SEND_ID:'是',
-            NOTES:'无',
-            }, {
-            ITEM_NO: 'NPP006911',
-            ITEM_NO_SAMPLE: '111',
-            NOTE: '墙画',
-            PRODUCTION_VERSION:'新墙标(大)',
-            QTY_REQUIRED:'大1卷',
-            PROMOTION:'团购订单',
-            PART_SEND_ID:'是',
-            NOTES:'无',
-            }, {
-            ITEM_NO: 'NPP006911',
-            ITEM_NO_SAMPLE: '111',
-            NOTE: '墙画',
-            PRODUCTION_VERSION:'新墙标(大)',
-            QTY_REQUIRED:'大1卷',
-            PROMOTION:'团购订单',
-            PART_SEND_ID:'是',
-            NOTES:'无',
-            } */
-        ]
+        ORDERBODY: []
       }
     };
   },
@@ -262,11 +224,6 @@ export default {
       this.headerData.activity = tab.PROMOTION_TYPE;
       console.log(this.headerData);
     },
-    /* openDialog(tab,index){
-      console.log(tab);
-      console.log(index);
-      this.detailVisible =  true;
-    }, */
     formatRole: function(row, column) {
       //return row.PART_SEND_ID ===0? "是":"否";  //预留
       if (row.PART_SEND_ID == 0) {
@@ -288,29 +245,6 @@ export default {
         console.log(this.Initial_balance);
       });
     },
-    //订单获取
-    /* refresh(){
-        var url = '/order/getOrders.do';
-        var data = {
-          limit:"1",
-          page:"1",
-          cid:Cookies.get('cid'),
-          state_id:"",
-          find:Cookies.get('ORDER_NO'),
-          beginTime:"",
-          finishTime:"",
-          ALL_SPEND:"",
-          orderType:"",
-          curtainStatusId:''
-        };
-        getOrderlist(url,data).then(res => {
-            console.log(res);
-            console.log(res.data[0]);
-            this.ruleForm.ORDER_NO=Cookies.get('ORDER_NO');
-            this.ruleForm=res.data[0];
-            //预留个备注
-        })        
-      }, */
     //[新]订单获取
     getDetail() {
       let url = "/order/getOrderContent.do";
@@ -346,7 +280,6 @@ export default {
         });
         payAgain(url, data).then(res => {
           console.log(res);
-          //this.addTab('order/myOrder');//让伯恩做跳转配置
           this.addTab("order/myOrder");
           this.closeTab("order/orderDetail");
         });

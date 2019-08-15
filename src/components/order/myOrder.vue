@@ -1,7 +1,11 @@
 <template>
   <el-card class="centerCard">
     <div>
-      <el-tabs style="display:inline-block;width:580px;" v-model="activeName" @tab-click="handleClick">
+      <el-tabs
+        style="display:inline-block;width:580px;"
+        v-model="activeName"
+        @tab-click="handleClick"
+      >
         <el-tab-pane label="全部订单" name></el-tab-pane>
         <el-tab-pane label="已提交" name="1"></el-tab-pane>
         <el-tab-pane label="已接收" name="12"></el-tab-pane>
@@ -20,7 +24,7 @@
         placeholder="日期区间"
         v-model="date1"
         style="width:14%;"
-      ></el-date-picker> 至 
+      ></el-date-picker>至
       <el-date-picker
         type="date"
         format="yyyy-MM-dd"
@@ -85,7 +89,9 @@
             <el-table-column prop="NOTE" label="类型" align="center"></el-table-column>
             <el-table-column label="数量" align="center" width="150">
               <template slot-scope="scope1">
-                <span v-if="scope1.row.UNIT=='平方米'">{{scope1.row.CURTAIN_WIDTH}}×{{scope1.row.CURTAIN_HEIGHT}}={{scope1.row.QTY_REQUIRED}}</span>
+                <span
+                  v-if="scope1.row.UNIT=='平方米'"
+                >{{scope1.row.CURTAIN_WIDTH}}×{{scope1.row.CURTAIN_HEIGHT}}={{scope1.row.QTY_REQUIRED}}</span>
                 <span v-else>{{scope1.row.QTY_REQUIRED}}</span>
               </template>
             </el-table-column>
@@ -117,7 +123,6 @@
                   type="primary"
                   size="small"
                 >查看详情</el-button>
-                <!-- :disabled="scope.row.packDetailId==0?true:false" -->
               </template>
             </el-table-column>
           </el-table>
@@ -210,7 +215,7 @@ export default {
       detailShow: true
     };
   },
-  activated:function(){
+  activated: function() {
     this.refresh();
   },
   filters: {
@@ -297,7 +302,8 @@ export default {
         transCookies[i].item.itemVersion = item.ORDERBODY[i].PRODUCTION_VERSION;
         //orderType
         transCookies[i].salPromotion = new Object();
-        transCookies[i].salPromotion.orderType = item.ORDERBODY[i].PROMOTION_TYPE;
+        transCookies[i].salPromotion.orderType =
+          item.ORDERBODY[i].PROMOTION_TYPE;
         transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
       }
       transCookies[0].item.groupType = "E";
@@ -355,7 +361,7 @@ export default {
         params: {
           itemNo: tab.ITEM_NO,
           orderId: tab.ORDER_NO,
-          lineNo:tab.LINE_NO
+          lineNo: tab.LINE_NO
         }
       });
       this.addTab("order/shipment");
@@ -423,7 +429,7 @@ export default {
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
-      if (row.STATUS_ID  == '3') {
+      if (row.STATUS_ID == "3") {
         return "fuck-row";
       }
       if (rowIndex % 2 == 0) {
@@ -475,7 +481,7 @@ p {
 }
 .el-table .fuck-row {
   background: #f0f9eb;
-  color:tomato;
+  color: tomato;
   text-decoration: line-through;
 }
 #outDiv .el-card__header {
@@ -485,7 +491,7 @@ p {
   padding: 5px 10px;
 }
 #outDiv .el-card {
-  padding-bottom:10px; 
+  padding-bottom: 10px;
   margin-bottom: 15px;
 }
 </style>

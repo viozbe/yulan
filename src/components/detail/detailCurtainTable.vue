@@ -367,7 +367,7 @@
                     type="textarea"
                     :rows="3"
                     placeholder="请输入订单审核意见"
-                    v-model="suggestion">
+                    v-model="suggestionLJ">
                 </el-input>
                 <el-button type="success" class="mr20" width="130px"
                     @click.native="resolvePass">
@@ -390,7 +390,7 @@
                     type="textarea"
                     :rows="3" disabled
                     placeholder="请输入订单审核意见"
-                    v-model="suggestion">
+                    v-model="suggestionLJ">
                 </el-input>
                 <el-button type="primary" class="mr20" width="130px"
                     @click.native="resolveModify">
@@ -409,7 +409,7 @@
                     type="textarea"
                     :rows="3" disabled
                     placeholder="请输入订单审核意见"
-                    v-model="suggestion">
+                    v-model="suggestionLJ">
                 </el-input>
                 <el-button type="danger" class="mr20" width="130px"
                     @click.native="resolveModify">
@@ -543,6 +543,7 @@ export default {
                 { label: 'PJB-009-QIANHUI:吊球+挂钩', value: 'PJB-009-QIANHUI' },
                 { label: '-未选择配件包-', value: null },
             ],
+            suggestionLJ: '',   //兰居人员总体审核意见
         }
     },
     props: ['headerData','curtainData','tableStatus','suggestion','isModified'],
@@ -627,7 +628,7 @@ export default {
                 }).then(() =>{
                     this.$emit('visible',false);
                     this.$emit('finalData',1);
-                    this.$emit('suggest',this.suggestion);
+                    this.$emit('suggest',this.suggestionLJ);
                 }).catch(() =>{})
             }
             //非修改
@@ -654,13 +655,13 @@ export default {
                     }).then(() => {
                         this.$emit('visible',false);
                         this.$emit('finalData',1);
-                        this.$emit('suggest',this.suggestion);
+                        this.$emit('suggest',this.suggestionLJ);
                     }).catch(() =>{});
                 }
                 else{
                     this.$emit('visible',false);
                     this.$emit('finalData',1);
-                    this.$emit('suggest',this.suggestion);
+                    this.$emit('suggest',this.suggestionLJ);
                 }
             }
         },
@@ -696,7 +697,7 @@ export default {
             console.log(_data)
             this.$emit('visible',false);
             this.$emit('finalData',_data);
-            this.$emit('suggest',this.suggestion);
+            this.$emit('suggest',this.suggestionLJ);
             this.$emit('deleteArr',_deleteArr);
         },
         //取消修改
@@ -1339,7 +1340,8 @@ export default {
             return re.test(str);
         },
         //获取原对比数据
-        getOldData(data){
+        async getOldData(data){
+            if(this.tableStatus === 3)  return
             this.compareData = JSON.parse(JSON.stringify(this.curtainData));
             this.part2 = [];
             let _obj = {
@@ -1373,19 +1375,27 @@ export default {
                 multiple: data.drape.toString(),
                 location: data.location
             }
-            getCurtainDetailMsg(obj).then(res =>{
+            getCurtainDetailMsg(obj).then(async res =>{
                 let _data = res.itemList;
-                this.compareData.forEach((item ,index) => {
+                for(let index = 0; index < this.compareData.length; index++){
                     for(let i = 0; i < _data.length; i++){
-                        //console.log(item.inlineNo)
-                        if(Number(_data[i].itemMLGY.no) === Number(item.inlineNo)){
-                            //console.log(_data[i].itemNo,item.inlineNo)
+                        if(Number(_data[i].itemMLGY.no) === Number(this.compareData[index].inlineNo)){
                             this.compareData[index].item.itemNo = _data[i].itemNo;
-                            this.compareData[index].certainHeightWidth = (_data[i].fixType === '02')?0:1
+                            let _comData = this.compareData[index];
+                            if(_comData.certainHeightWidth !== null && _comData.productType === 'ML'){
+                                let _itemObj = {
+                                    itemType: _comData.productType,
+                                    itemNO: this.data[index].item.itemNo,
+                                    limit: 1,
+                                    page: 1,
+                                }
+                                let res = await changeItemBlur(_itemObj)
+                                this.compareData[index].certainHeightWidth = (res.data[0].fixType === '02')?0:1
+                            }
                             break;
                         }
                     }
-                })
+                }
             })
         },
         //大类二类的勾选联动，是否出现×号
@@ -1423,7 +1433,7 @@ export default {
         //     return JSON.parse(JSON.stringify(this.curtainData));
         // }
     },
-    activated: function(){
+    activated:function(){
         //按规则排序
         this.curtainData.sort(function(a,b){
             let rule = ['lt','ls','lspb','sha','pjb']
@@ -1435,6 +1445,7 @@ export default {
         this.getOldData(this.headerData);
         this.clearArr();
         this.getSpanArr(this.data);
+        this.suggestionLJ = this.suggestion.toString();
     },
     deactivated:function(){
         
