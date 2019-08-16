@@ -61,7 +61,7 @@
           <el-button
             :id="'cardBtnCheck' + item.ORDER_NO"
             style="float: right;margin-right:10px;"
-            v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID!='0')||item.CURTAIN_STATUS_ID=='3'"
+            v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID=='1')||item.CURTAIN_STATUS_ID=='3'"
             @click="toExamineDetail(item.ORDER_NO)"
             size="mini"
             type="success"
@@ -71,7 +71,7 @@
           <span class="zoomRight">{{item.DATE_CRE}}</span>
           <span class="zoomLeft">订单号：</span>
           <span class="zoomRight">{{item.ORDER_NO}}</span>
-          <span class="zoomLeft">状态：</span>
+          <span class="zoomLeft">窗帘状态：</span>
           <span
             style="color:#8BC34A;font-weight:bold;"
             class="zoomRight"
@@ -121,7 +121,7 @@
             <p style="width:100px; font-size:18px; color:tomato; text-align:center;">{{item.status}}</p>
             <p>
               <el-button
-                v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID!='0')||item.CURTAIN_STATUS_ID=='3'"
+                v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID=='1')||item.CURTAIN_STATUS_ID=='3'"
                 @click="toExamineDetail(item.ORDER_NO)"
                 size="medium"
                 type="success"
@@ -204,6 +204,10 @@ export default {
         {
           label: "客户待确认",
           value: "2"
+        },
+        {
+          label: "客户待提交",
+          value: "8"
         }
       ],
       options3: [
@@ -389,7 +393,7 @@ export default {
           break;
         case "customCheck":
           this.options = this.options2;
-          this.canOptionValue = ["1", "2"];
+          this.canOptionValue = ["1", "2","8"];
           break;
         case "checked":
           this.options = this.options3;
