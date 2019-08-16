@@ -313,6 +313,7 @@ export default {
       }
       transCookies[0].item.groupType = "E";
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
       this.addTab("order/checkOrder");
       console.log(transCookies);
