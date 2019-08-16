@@ -351,7 +351,7 @@ export default {
                     this.moneySituation = '当前余额充足，请继续保持'
                 }
             }).catch(err =>{
-                console.log(res);
+                console.log(err);
             })
         },
         //按钮样式--菜单展开收起
@@ -683,6 +683,12 @@ export default {
 }
 .el-badge__content{
     border: none!important;
+}
+.el-table th.gutter{
+    display: table-cell!important;
+}
+.el-table colgroup.gutter{
+    display: table-cell!important;
 }
 </style>
 

@@ -3,7 +3,9 @@ import Axios from 'axios'
 const CODE_OK = 0;
 var urlArray ={
     JAVA:'http://14.29.223.114:10250/yulan-order',
-    ASP:'http://localhost:59155/'
+    //JAVA:'http://106.14.159.244:8080/yulan-order',
+    ASP:'http://47.107.56.156:568/'
+    //ASP:'http://localhost:59155/'
 }
 //Axios.defaults.baseURL = 'http://106.14.159.244:8080/yulan-capital';
 Axios.defaults.withCredentials = true;

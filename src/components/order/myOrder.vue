@@ -11,9 +11,9 @@
         <el-tab-pane label="已接收" name="12"></el-tab-pane>
         <el-tab-pane label="已受理" name="2"></el-tab-pane>
         <el-tab-pane label="已作废" name="3"></el-tab-pane>
-        <el-tab-pane label="窗帘待审核" name="90"></el-tab-pane>
+        <el-tab-pane label="窗帘待处理" name="90"></el-tab-pane>
       </el-tabs>
-      <a target="_blank" style="float:right;" href="http://www.luxlano.com/ddkc/">玉兰·兰居商品-订单及库存查询</a>
+      <a target="_blank" style="float:right;" href="http://www.luxlano.com/ddkc/">玉兰·兰居尚品->订单及库存查询</a>
     </div>
 
     <div>
@@ -24,7 +24,7 @@
         placeholder="日期区间"
         v-model="date1"
         style="width:14%;"
-      ></el-date-picker>至
+      ></el-date-picker>&nbsp;至
       <el-date-picker
         type="date"
         format="yyyy-MM-dd"
@@ -81,13 +81,13 @@
           <el-table
             border
             :data="data[index].ORDERBODY"
-            style="width: 100%"
+            style="width: 100%;margin-bottom:5px;"
             :row-class-name="tableRowClassName"
           >
             <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
             <el-table-column prop="BRAND_NAME" label="品牌" align="center" width="150"></el-table-column>
-            <el-table-column prop="NOTE" label="类型" align="center"></el-table-column>
-            <el-table-column label="数量" align="center" width="150">
+            <el-table-column prop="NOTE" label="类型" align="center" width="120"></el-table-column>
+            <el-table-column label="数量" align="center" width="100">
               <template slot-scope="scope1">
                 <span
                   v-if="scope1.row.UNIT=='平方米'"
@@ -123,6 +123,7 @@
                   type="primary"
                   size="small"
                 >查看详情</el-button>
+                <!-- :disabled="scope.row.packDetailId==0?true:false" -->
               </template>
             </el-table-column>
           </el-table>
@@ -143,7 +144,7 @@
             <p>
               <el-button
                 @click="summitCurtain(item)"
-                v-if="item.CURTAIN_STATUS_ID=='4'"
+                v-if="item.CURTAIN_STATUS_ID=='0' && item.STATUS_ID=='0'"
                 size="medium"
                 type="primary"
                 plain
@@ -153,7 +154,7 @@
           <router-link to="/order/checkExamine">
             <p>
               <el-button
-                @click="toCheckExamine(item.ORDER_NO,item.CURTAIN_STATUS_ID)"
+                @click="toCheckExamine(item.ORDER_NO,item.CURTAIN_STATUS_ID,item.STATUS_ID)"
                 v-if="item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='1'||item.CURTAIN_STATUS_ID=='2'||item.CURTAIN_STATUS_ID=='3'||item.CURTAIN_STATUS_ID=='4'"
                 size="medium"
                 type="danger"
@@ -221,6 +222,9 @@ export default {
   filters: {
     transStatus(value) {
       switch (value) {
+        case "0":
+          return "待提交";
+          break;
         case "1":
           return "已提交";
           break;
@@ -262,7 +266,7 @@ export default {
           return "兰居待修改";
           break;
         case "4":
-          return "可提交";
+          return "已通过";
           break;
       }
     },
@@ -290,6 +294,7 @@ export default {
         transCookies[i].width = item.ORDERBODY[i].CURTAIN_WIDTH;
         transCookies[i].height = item.ORDERBODY[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
+        transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
         transCookies[i].activityId = item.ORDERBODY[i].PROMOTION_TYPE;
         transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
         transCookies[i].price = item.ORDERBODY[i].UNIT_PRICE;
@@ -308,14 +313,15 @@ export default {
       }
       transCookies[0].item.groupType = "E";
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
-      Cookies.set("cur_status", 1);
+      Cookies.set("cur_status", 3);
       this.addTab("order/checkOrder");
       console.log(transCookies);
     },
     //查看审核
-    toCheckExamine(value, ID) {
+    toCheckExamine(value, ID, status) {
       Cookies.set("ORDER_NO", value);
       Cookies.set("CURTAIN_STATUS_ID", ID);
+      Cookies.set("CYR_STATUS_ID", status);
       this.addTab("order/checkExamine");
     },
     //订单详情
@@ -456,7 +462,6 @@ export default {
 }
 .zoomLeft {
   font-size: 15px;
-  font-weight: bold;
 }
 p {
   font-size: 13px;
@@ -464,6 +469,7 @@ p {
 }
 .buttonDiv {
   float: right;
+  margin-right: 15px;
   width: 8%;
   /* position: absolute;
   top: 50%;
@@ -473,6 +479,8 @@ p {
 .zoomRight {
   font-weight: 400;
   font-size: 15px;
+  margin-right: 10px;
+  font-weight: bold;
 }
 </style>
 <style>
@@ -492,8 +500,7 @@ p {
   padding: 5px 10px;
 }
 #outDiv .el-card {
-  padding-bottom:5px; 
-  margin-bottom: 5px;
+  margin-top: 5px;
   border: 1px solid rgb(140, 214, 198);
 }
 </style>

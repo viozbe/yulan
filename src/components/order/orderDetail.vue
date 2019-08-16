@@ -1,6 +1,6 @@
 <template>
   <el-card class="centerCard">
-    <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" width="1300px">
+    <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="1300px" top="5vh">
       <keep-alive>
         <detailCurtainTable
           v-if="detailVisible"
@@ -31,19 +31,19 @@
           收货人：
           <span class="zoomRight">{{ruleForm.WL_CONTACTS}}({{ruleForm.WL_TEL}})</span>
         </span>
-        <br>
+        <br />
         <span class="zoomLeft">
           收货地址：
           <span
             class="zoomRight"
           >{{ruleForm.RECIVER_AREA1}}{{ruleForm.RECIVER_AREA2}}{{ruleForm.RECIVER_AREA3}}{{ruleForm.POST_ADDRESS}}</span>
         </span>
-        <br>
+        <br />
         <span class="zoomLeft">
           备注：
           <span class="zoomRight">{{ruleForm.NOTES}}</span>
         </span>
-        <br>
+        <br />
         <span class="zoomLeft">
           玉兰处理说明：
           <span class="zoomRight">{{ruleForm.YULAN_NOTES}}</span>
@@ -103,7 +103,7 @@
           应付总金额：
           <span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span>
         </p>
-        <br>
+        <br />
         <el-button @click="refreshPay()" size="medium" type="danger" plain>订单提交</el-button>
       </div>
     </el-card>
@@ -287,7 +287,7 @@ export default {
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
-      if (row.STATUS_ID  == '3') {
+      if (row.STATUS_ID == "3") {
         return "fuck-row";
       }
       if (rowIndex % 2 == 0) {
@@ -330,10 +330,10 @@ export default {
   line-height: 30px;
   display: inline-block;
   margin-right: 30px;
+  font-weight: bold;
 }
 .zoomLeft {
   font-size: 15px;
-  font-weight: bold;
   display: inline-block;
   margin-right: 10px;
 }

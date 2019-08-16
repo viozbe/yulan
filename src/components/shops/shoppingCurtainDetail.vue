@@ -46,10 +46,10 @@
                 </el-table-column>
                 <el-table-column label="名称"
                     header-align="center"
-                    width="60">
+                    width="90">
                     <template slot-scope="scope">
                         {{getTypeName(scope.row.itemType)}}
-                        <br>
+                        <!-- <br> -->
                         <el-checkbox @change="changeLink('lt',0)" v-if="scope.row.itemType === 'lt'" v-model="chooseBig[0]">
                             <span v-if="chooseBig[0] == false" style="color: red;">×</span>
                         </el-checkbox>
@@ -67,7 +67,7 @@
                 </el-table-column>
                 <el-table-column label="编码"
                     header-align="center"
-                    width="140">
+                    width="130">
                     <template slot-scope="scope">
                         <div>
                             <span v-if="(scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y')">
@@ -129,7 +129,7 @@
                 </el-table-column>
                 <el-table-column label="名称" 
                     header-align="center"
-                    width="100">
+                    width="120">
                     <template slot-scope="scope">
                         <div v-if="scope.row.note !== null">{{scope.row.note}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
@@ -168,13 +168,18 @@
                 </el-table-column>
                 <el-table-column label="用量"
                     header-align="center"
-                    width="85">
+                    width="80">
                     <template slot-scope="scope">
                         <span v-if="scope.row.itemType === 'lspb'"></span>
                         <span v-else-if="scope.row.modifyFlag === 'Y'">
                             <el-input
                                 style="width: 75%;"
                                 size="mini"
+                                oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
                                 v-model="scope.row.dosage">
                             </el-input>
                             {{(scope.row.dosage === '')?'':scope.row.unit}}

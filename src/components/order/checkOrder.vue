@@ -352,14 +352,15 @@
           <span>{{allSpend| priceFilter}}</span>
         </p>
         <el-button @click="backToOrder" size="medium" type="success" plain>返回订单</el-button>
-        <el-button v-if="curtainOrOther" @click="payIt" size="medium" type="danger" plain>立即提交</el-button>
+        <el-button v-if="curtainStatus =='0'" @click="payIt" size="medium" type="danger" plain>立即提交</el-button>
         <el-button
-          v-if="!curtainOrOther"
+          v-if="curtainStatus =='1'"
           @click="payCurtain()"
           size="medium"
           type="danger"
           plain
         >确认提交</el-button>
+        <el-button v-if="curtainStatus =='3'" @click="payNew" size="medium" type="danger" plain>确认提交</el-button>
       </div>
     </el-card>
   </el-card>
@@ -380,6 +381,8 @@ import { submitOrder } from "@/api/orderList";
 import { CouponUseRecord } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
 import { curtainPay } from "@/api/orderList";
+import { orderSettlement } from "@/api/orderListASP";
+import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
 /* import { mapMutations } from 'vuex' 
 import { mapState } from 'vuex' */
@@ -639,9 +642,9 @@ export default {
       searchTickets(url, data).then(res => {
         console.log(res.data);
         this.couponData = res.data;
-        for(let i=0;i<this.couponData.length;i++){
-          if(this.couponData[i].dateId === 0){
-            this.couponData.splice(i,1)
+        for (let i = 0; i < this.couponData.length; i++) {
+          if (this.couponData[i].dateId === 0) {
+            this.couponData.splice(i, 1);
           }
         }
       });
@@ -1078,6 +1081,15 @@ export default {
         this.array2[i] = new Object();
         this.array2[i].curtainWidth = getPush2[i].width;
         this.array2[i].curtainHeight = getPush2[i].height;
+        this.array2[i].curtainHeight2 = getPush2[i].falseShadeHigh
+          ? getPush2[i].falseShadeHigh
+          : 0;
+        this.array2[i].curtainSizeTimes = getPush2[i].drape
+          ? getPush2[i].drape
+          : 0;
+        this.array2[i].curtainRoomName = getPush2[i].location
+          ? getPush2[i].location
+          : "";
         if (getPush2[0].salPromotion != null) {
           this.array2[i].promotionType = getPush2[0].salPromotion.orderType;
           this.array2[i].flagFlType = getPush2[0].salPromotion.falgFl;
@@ -1088,6 +1100,7 @@ export default {
         this.array2[i].yuefanli = 0;
         this.array2[i].nianfanli = 0;
         this.array2[i].itemNoSample = getPush2[i].item.itemNo;
+        this.array2[i].lineNo = getPush2[i].lineNo;
         this.array2[i].itemNo = getPush2[i].item.itemNo;
         this.array2[i].partSendId = getPush2[i].splitShipment; //splicement？？？
         this.array2[i].productionVersion = getPush2[i].item.itemVersion;
@@ -1110,8 +1123,6 @@ export default {
         //this.array2[i].finalPrice = (this.array[i].questPrice/this.array2[i].qtyRequired).toFixed(2);
         this.array2[i].finalPrice = this.array[i].questPrice;
       }
-      console.log(this.array2);
-      console.log(this.array2[0].promotion);
       this.ORDERBODY = this.array2;
     },
     //窗帘提交结算
@@ -1163,6 +1174,62 @@ export default {
           }
         })
         .then(() => {
+          this.closeToTab({
+            oldUrl: "order/checkOrder",
+            newUrl: "order/myOrder"
+          });
+        });
+    },
+    payNew() {
+      var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+      this.ctm_order.orderNo = this.array2[0].orderNo;
+      var deleteArray = [];
+      for (var i = 0; i < getPush3.length; i++) {
+        deleteArray[i] = getPush3[i].cartItemId;
+      }
+      var data = {
+        product_group_tpye: "E", //产品类别
+        promotion_cost: this.totalPrice, //活动价格【】
+        cid: Cookies.get("cid"), //登录用户账号
+        companyId: Cookies.get("companyId"),
+        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+        rebateM: this.rebateM, //月优惠券编号
+        arrearsFlag: this.arrearsFlag,
+        ctm_order: this.ctm_order,
+        ctm_orders: this.array2,
+        cartItemIDs: deleteArray
+      };
+      if (
+        this.ctm_order.deliveryNotes == "" &&
+        this.ctm_order.deliveryType == 3
+      ) {
+        this.$alert("请填写指定的物流公司", "提示", {
+          confirmButtonText: "确定",
+          type: "warning"
+        });
+        return;
+      }
+      orderSettlement(data)
+        .then(res => {
+          console.log(res);
+          console.log("成功!!!");
+          if (
+            /* this.totalPrice */ this.allSpend > this.Initial_balance &&
+            this.arrearsFlag != "N"
+          ) {
+            this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
+              confirmButtonText: "确定",
+              type: "warning"
+            });
+          } else {
+            this.$alert("提交成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success"
+            });
+          }
+        })
+        .then(() => {
+          deleteCurtain(deleteArray); //删除订单信息
           this.closeToTab({
             oldUrl: "order/checkOrder",
             newUrl: "order/myOrder"
@@ -1282,6 +1349,7 @@ export default {
     this.cid = Cookies.get("cid");
     this.realName = Cookies.get("realName");
     console.log(Cookies.get("cur_status"));
+    this.curtainStatus = Cookies.get("cur_status");
     if (Cookies.get("cur_status") == 1) {
       this.curtainOrOther = false;
     } else {
@@ -1351,7 +1419,7 @@ export default {
   border-radius: 15px; /*圆角的大小 */
 }
 .cctv {
-  background: url("./../../../static/coupon.png");
+  background: url("coupon.png");
   width: 350px;
   height: 230px;
   margin-right: 10%;
@@ -1370,7 +1438,7 @@ export default {
   margin-top: 5px;
 }
 .logo {
-  background: url('./../../../static/logopng.png');
+  background: url("logopng.png");
   width: 40px;
   height: 40px;
   background-size: 100%;

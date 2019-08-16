@@ -5,6 +5,7 @@
         <el-tab-pane label="待处理的订单" name="unCheck"></el-tab-pane>
         <el-tab-pane label="待客户处理的订单" name="customCheck"></el-tab-pane>
         <el-tab-pane label="审核过的订单" name="checked"></el-tab-pane>
+        <el-tab-pane label="全部订单" name="allOrder"></el-tab-pane>
       </el-tabs>
     </div>
     <div>
@@ -24,7 +25,7 @@
         v-model="date2"
         style="width:14%;"
       ></el-date-picker>
-      <el-select v-model="orderType" placeholder="请选择订单状态">
+      <el-select v-model="orderType" placeholder="请选择审核状态">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -34,7 +35,7 @@
       </el-select>
       <el-input
         @keyup.enter.native="search()"
-        placeholder="请输入相关信息搜索订单"
+        placeholder="请输入订单号或客户名称"
         v-model="find"
         style="width:300px;"
       >
@@ -60,7 +61,7 @@
           <el-button
             :id="'cardBtnCheck' + item.ORDER_NO"
             style="float: right;margin-right:10px;"
-            v-if="item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='3'"
+            v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID!='0')||item.CURTAIN_STATUS_ID=='3'"
             @click="toExamineDetail(item.ORDER_NO)"
             size="mini"
             type="success"
@@ -82,7 +83,7 @@
           >{{item.STATUS_ID | transStatus}}</span>
           <br />
           <span class="zoomLeft">客户名称：</span>
-          <span style="color:gray" class="zoomRight">{{item.REALNAME||item.realName}}</span>
+          <span class="zoomRight">{{item.REALNAME||item.realName}}</span>
           <span class="zoomLeft">联系人：</span>
           <span class="zoomRight">{{item.LINKPERSON}}</span>
           <span class="zoomLeft">电话：</span>
@@ -91,6 +92,7 @@
         <div :id="'cardBody' + item.ORDER_NO" class="collapseHive">
           <div class="outDiv" style="float:left;width:90%">
             <el-table
+              border
               :data="data[index].ORDERBODY"
               style="width: 100%;margin-bottom:5px;"
               :row-class-name="tableRowClassName"
@@ -113,21 +115,13 @@
                   <span>{{scope1.row.UNIT_PRICE*scope1.row.QTY_REQUIRED | priceFilter}}</span>
                 </template>
               </el-table-column>
-              <!-- 
-            <el-table-column
-            align="center"           
-            label="出货详情">
-            <template slot-scope="scope">
-              <el-button :disabled="scope.row.packDetailId==0?true:false"  @click="shipmentDetail(scope.row,item.ORDER_NO)" type="primary" size="small">查看详情</el-button>
-            </template>
-              </el-table-column>-->
             </el-table>
           </div>
           <div class="buttonDiv">
             <p style="width:100px; font-size:18px; color:tomato; text-align:center;">{{item.status}}</p>
             <p>
               <el-button
-                v-if="item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='3'"
+                v-if="(item.CURTAIN_STATUS_ID=='0'&&item.STATUS_ID!='0')||item.CURTAIN_STATUS_ID=='3'"
                 @click="toExamineDetail(item.ORDER_NO)"
                 size="medium"
                 type="success"
@@ -170,75 +164,7 @@ export default {
   name: "MyOrder",
   data() {
     return {
-      data: [
-        /* {
-            WEB_TJ_TIME:' 2019-1-29 13:00:00 ',
-            ORDER_NO:'W1610030066',
-            WL_CONTACTS:'测试乙',
-            POST_ADDRESS:'广东省广州市番禺区大学城小谷围广东工业大学',
-            WL_TEL:'15551551551',
-            status:'待收货',
-            complaint:true,
-            ORDERBODY: [
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:88,
-              all_cost:0,
-            },]
-            },
-            {
-            WEB_TJ_TIME:' 2019-1-29 13:00:11 ',
-            ORDER_NO:'W1610030066',
-            WL_CONTACTS:'测试乙',
-            POST_ADDRESS:'广东省广州市番禺区大学城小谷围广东工业大学',
-            WL_TEL:'15551551551',
-            status:'已收货',
-            complaint:false,
-            ORDERBODY: [
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },
-            {
-              BRAND_NAME: '玉兰',
-              NOTE: '窄幅墙纸',
-              ITEM_NO: 'NPP002305',
-              QTY_REQUIRED:6,
-              UNIT_PRICE:11,
-              all_cost:0,
-            },],} */
-      ],
+      data: [],
       date1: "",
       date2: "",
       find: "",
@@ -272,15 +198,37 @@ export default {
       ],
       options2: [
         {
-          label: "待修改",
+          label: "客户待修改",
           value: "1"
         },
         {
-          label: "待确认",
+          label: "客户待确认",
           value: "2"
         }
       ],
       options3: [
+        {
+          label: "已通过",
+          value: "4"
+        }
+      ],
+      options4: [
+        {
+          label: "待审核",
+          value: "0"
+        },
+        {
+          label: "客户待修改",
+          value: "1"
+        },
+        {
+          label: "客户待确认",
+          value: "2"
+        },
+        {
+          label: "兰居待修改",
+          value: "3"
+        },
         {
           label: "已通过",
           value: "4"
@@ -292,7 +240,7 @@ export default {
     transStatus(value) {
       switch (value) {
         case "0":
-          return "窗帘待审核";
+          return "待提交";
           break;
         case "1":
           return "已提交";
@@ -326,10 +274,10 @@ export default {
           return "待审核";
           break;
         case "1":
-          return "待修改";
+          return "客户待修改";
           break;
         case "2":
-          return "待确认";
+          return "客户待确认";
           break;
         case "3":
           return "兰居待修改";
@@ -356,93 +304,23 @@ export default {
       Cookies.set("ORDER_NO", val);
       console.log(Cookies.get("ORDER_NO"));
       this.addTab("order/examineDetail");
-      /* 
-        this.$router.push({
-          name:`examineDatail`
-        }) */
     },
     toCheckExamine(val) {
       Cookies.set("ORDER_NO", val);
-      Cookies.set("CURTAIN_STATUS_ID", 0);
+      Cookies.set("CURTAIN_STATUS_ID", -1);
+      Cookies.set("CYR_STATUS_ID", -2);
       this.addTab("order/checkExamine");
     },
-    //订单获取
-    /* refresh(){
-        var url = '/order/getOrders.do';
-        var data = {
-        limit:"4",
-        page:this.currentPage,
-        cid:Cookies.get('cid'),
-        state_id:0,
-        find:this.find,
-        beginTime:this.date1,
-        finishTime:this.date2,
-        orderType:this.orderType,
-        curtainStatusId:''
-        };
-        if(this.date1!='' || this.date2!=''){
-          data.beginTime=this.date1+' 00:00:00';
-          data.finishTime=this.date2+' 23:59:59';
-        }
-        
-        getOrderlist(url,data).then(res => {
-            console.log(res);
-            this.count=res.count;
-            console.log(res.count);
-            this.data=[];
-            this.data=res.data;
-            console.log(this.data);
-        })        
-      }, */
     //[新]获取审核订单
-    getorderList() {
-      let url = "/order/gatAllCurOrders.do";
-      let data = {
-        limit: this.orderType?this.limit:100000,
-        page: this.orderType?this.currentPage:1,
-        find: this.find,
-        beginTime: this.date1,
-        finishTime: this.date2,
-        curtainStatusId: this.orderType
-      };
-      if (data.beginTime == "") {
-        data.beginTime = "0001/1/1";
-      }
-      if (data.finishTime == "") {
-        data.finishTime = "9999/12/31";
-      } else {
-        data.finishTime = data.finishTime + " 23:59:59";
-      }
-      getOrderlist(url,data).then(res => {
-        //不改后台的情况下筛选不同页签的数据
-        var allData = res.data;
-        var filter = [];
-        switch(this.activeName)
-        {
-          case "unCheck":
-               filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='0'||item.CURTAIN_STATUS_ID=='3');
-               break;
-               case "customCheck":
-                 filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='1'||item.CURTAIN_STATUS_ID=='2');
-                 break;
-                 case "checked":
-                filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='4');
-                 break;
-        }
-        this.count = filter.length;
-        this.data = [];
-        this.data = filter.slice(this.currentPage*5 -5,this.currentPage *5);
-      });
-    },
     // getorderList() {
     //   let url = "/order/gatAllCurOrders.do";
     //   let data = {
-    //     limit: this.limit,
-    //     page: this.currentPage,
+    //     limit: this.orderType?this.limit:100000,
+    //     page: this.orderType?this.currentPage:1,
     //     find: this.find,
     //     beginTime: this.date1,
     //     finishTime: this.date2,
-    //     curtainStatusId: this.orderType || this.canOptionValue
+    //     curtainStatusId: this.orderType
     //   };
     //   if (data.beginTime == "") {
     //     data.beginTime = "0001/1/1";
@@ -452,13 +330,52 @@ export default {
     //   } else {
     //     data.finishTime = data.finishTime + " 23:59:59";
     //   }
-    //   //新后台
-    //   getCurtainOrders(data).then(res => {
-    //     this.count = res.count;
+    //   getOrderlist(url,data).then(res => {
+    //     //不改后台的情况下筛选不同页签的数据
+    //     var allData = res.data;
+    //     var filter = [];
+    //     switch(this.activeName)
+    //     {
+    //       case "unCheck":
+    //            filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='0'||item.CURTAIN_STATUS_ID=='3');
+    //            break;
+    //            case "customCheck":
+    //              filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='1'||item.CURTAIN_STATUS_ID=='2');
+    //              break;
+    //              case "checked":
+    //             filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='4');
+    //              break;
+    //     }
+    //     this.count = filter.length;
     //     this.data = [];
-    //     this.data = res.data;
+    //     this.data = filter.slice(this.currentPage*5 -5,this.currentPage *5);
     //   });
     // },
+    getorderList() {
+      let url = "/order/gatAllCurOrders.do";
+      let data = {
+        limit: this.limit,
+        page: this.currentPage,
+        find: this.find,
+        beginTime: this.date1,
+        finishTime: this.date2,
+        curtainStatusId: this.orderType || this.canOptionValue
+      };
+      if (!data.beginTime) {
+        data.beginTime = "0001/1/1";
+      }
+      if (!data.finishTime) {
+        data.finishTime = "9999/12/31";
+      } else {
+        data.finishTime = data.finishTime + " 23:59:59";
+      }
+      //新后台
+      getCurtainOrders(data).then(res => {
+        this.count = res.count;
+        this.data = [];
+        this.data = res.data;
+      });
+    },
     //标签页切换
     handleClick(tab) {
       var tabName = tab.name;
@@ -477,6 +394,11 @@ export default {
         case "checked":
           this.options = this.options3;
           this.canOptionValue = ["4"];
+          break;
+        case "allOrder":
+          this.options = this.options4;
+          //this.canOptionValue = ["0","1", "2", "3","4"];
+          this.canOptionValue = [];
           break;
       }
       this.getorderList();
@@ -532,12 +454,8 @@ export default {
   },
   //生命周期
   created() {
-    //this.refresh();
     this.getorderList();
     console.log(Cookies.get("cid"));
-    // this.$router.push({
-    //   name:`myOrder`
-    // });
   },
   activated: function() {
     this.getorderList();
@@ -559,7 +477,6 @@ export default {
 } */
 .zoomLeft {
   font-size: 15px;
-  font-weight: bold;
 }
 p {
   font-size: 13px;
@@ -574,6 +491,7 @@ p {
   font-weight: 400;
   font-size: 15px;
   margin-right: 10px;
+  font-weight: bold;
 }
 .collapseHive {
   display: none;
@@ -591,7 +509,6 @@ p {
   padding: 5px 10px;
 }
 #outDiv .el-card {
-  margin-top: 5px;
   margin-top: 5px;
   border: 1px solid rgb(140, 214, 198);
 }

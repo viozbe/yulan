@@ -15,3 +15,11 @@ export function orderSettlement(data){
         return Promise.reject(err);
     })
 }
+
+export function updateCurtainOrder(data){
+    return post('/CTM_ORDER/updateCurtainOrder',data,'ASP').then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) =>{
+        return Promise.reject(err);
+    })
+}
