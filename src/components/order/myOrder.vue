@@ -144,7 +144,7 @@
             <p>
               <el-button
                 @click="summitCurtain(item)"
-                v-if="item.CURTAIN_STATUS_ID=='0' && item.STATUS_ID=='0'"
+                v-if="(item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='4') && item.STATUS_ID=='0'"
                 size="medium"
                 type="primary"
                 plain

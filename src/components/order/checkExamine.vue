@@ -88,7 +88,7 @@
           type="success"
         >确认修改</el-button>
         <el-button
-          v-if="check_CURTAIN_STATUS_ID==0&&check_STATUS_ID==0"
+          v-if="(check_CURTAIN_STATUS_ID==0||check_CURTAIN_STATUS_ID==4)&&check_STATUS_ID==0"
           @click="summitCurtain"
           size="medium"
           type="primary"
@@ -265,7 +265,7 @@ export default {
               //   oldUrl:'order/checkExamine',
               //   newUrl:'order/myOrder'
               // })
-              this.check_CURTAIN_STATUS_ID = "0";
+              this.check_CURTAIN_STATUS_ID = "4";
             });
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
