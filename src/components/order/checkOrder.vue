@@ -435,12 +435,12 @@ export default {
         allSpend: "1000",
         deliveryFlag: "0",
         invoiceFlag: "0",
-        wlContacts: "test4",
-        wlTel: "23432432",
-        postAddress: "具体地址",
-        reciverArea1: "省",
-        reciverArea2: "市",
-        reciverArea3: "县"
+        wlContacts: "",
+        wlTel: "",
+        postAddress: "",
+        reciverArea1: "",
+        reciverArea2: "",
+        reciverArea3: ""
       },
       options: [
         {
@@ -951,16 +951,44 @@ export default {
           this.transferData = res.data.data;
           this.sortAddress();
           this.data = [];
-          this.data[0] = this.transferData[0];
+          if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
+            var addIndex = 0;
+            for(var i =0; i< this.transferData.length;i++)
+            {
+              var addArr ={//跟字段对应上，直接判断
+                 cid:this.transferData[i].cid,
+                 postAddress:this.ctm_order.postAddress,
+                 wlContacts:this.ctm_order.wlContacts,
+                 wlTel:this.ctm_order.wlTel,
+                 addressId :this.transferData[i].addressId,
+                 province:this.ctm_order.reciverArea1,
+                 city:this.ctm_order.reciverArea2,
+                 country:this.ctm_order.reciverArea3,
+                 provinceID:this.transferData[i].provinceID,
+                 cityID:this.transferData[i].cityID,
+                 countryID:this.transferData[i].countryID,
+              }
+              if(JSON.stringify(addArr) == JSON.stringify(this.transferData[i]))
+              {
+                 addIndex = i;
+                 break;
+              }
+            }
+            this.radio = addIndex;
+            this.addressIt =true;
+            this.showAddress();
+          } else {
+            this.data[0] = this.transferData[0];
 
-          this.ctm_order.wlTel = this.data[0].wlTel;
-          this.ctm_order.wlContacts = this.data[0].wlContacts;
-          this.ctm_order.postAddress = this.data[0].postAddress;
-          this.ctm_order.reciverArea1 = this.data[0].province;
-          this.ctm_order.reciverArea2 = this.data[0].city;
-          this.ctm_order.reciverArea3 = this.data[0].country;
-          this.ctm_order.allAddress = this.data[0].postAddress;
-          console.log(this.ctm_order.allAddress);
+            this.ctm_order.wlTel = this.data[0].wlTel;
+            this.ctm_order.wlContacts = this.data[0].wlContacts;
+            this.ctm_order.postAddress = this.data[0].postAddress;
+            this.ctm_order.reciverArea1 = this.data[0].province;
+            this.ctm_order.reciverArea2 = this.data[0].city;
+            this.ctm_order.reciverArea3 = this.data[0].country;
+            this.ctm_order.allAddress = this.data[0].postAddress;
+            console.log(this.ctm_order.allAddress);
+          }
         })
         .catch(error => {
           console.log(error);
@@ -1016,7 +1044,6 @@ export default {
     //预留算法 获取活动价
     huodongjia() {
       let getPush = JSON.parse(sessionStorage.getItem("shopping"));
-      //var getPush=JSON.parse(Cookies.get('shopping'));  //Cookies.get('shopping') 替换上去 Cookies.get('shopping')
       console.log(getPush);
       this.product_group_tpye = getPush[0].item.groupType; //产品类别
       if (getPush[0].salPromotion != null) {
@@ -1072,8 +1099,6 @@ export default {
     },
     //预留算法 获取订单列表
     orderList() {
-      //var array2 =[];
-      //var getPush2=JSON.parse(Cookies.get('shopping'));
       var getPush2 = JSON.parse(sessionStorage.getItem("shopping"));
       console.log(getPush2);
 
@@ -1182,7 +1207,7 @@ export default {
     },
     payNew() {
       var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-      this.ctm_order.orderNo = this.array2[0].orderNo;
+      //this.ctm_order.orderNo = this.array2[0].orderNo;
       var deleteArray = [];
       for (var i = 0; i < getPush3.length; i++) {
         deleteArray[i] = getPush3[i].cartItemId;
@@ -1252,7 +1277,6 @@ export default {
       };
       //删除购物车数据
       var deleteArray = [];
-      //var getPush3=JSON.parse(Cookies.get('shopping'));
       var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
       for (var i = 0; i < getPush3.length; i++) {
         deleteArray[i] = getPush3[i].id;
@@ -1335,11 +1359,35 @@ export default {
       let _price = parseFloat(price);
       let square = Math.round(_width * _height * 100) / 100;
       return Math.round(price * square * 100) / 100;
+    },
+    getOrderHead() {
+      var getPush = JSON.parse(sessionStorage.getItem("shopping"));
+      var orderItem = JSON.parse(sessionStorage.getItem("shoppingHead"));
+      if (getPush[0].orderNumber) {
+        this.ctm_order.orderNo = orderItem.ORDER_NO;
+        this.ctm_order.buyUser = orderItem.BUYUSER;
+        this.ctm_order.buyUserPhone = orderItem.BUYUSERPHONE;
+        this.ctm_order.wlContacts = orderItem.WL_CONTACTS;
+        this.ctm_order.wlTel = orderItem.WL_TEL;
+        this.ctm_order.postAddress = orderItem.POST_ADDRESS;
+        this.ctm_order.reciverArea1 = orderItem.RECIVER_AREA1;
+        this.ctm_order.reciverArea2 = orderItem.RECIVER_AREA2;
+        this.ctm_order.reciverArea3 = orderItem.RECIVER_AREA3;
+        this.ctm_order.notes = orderItem.NOTES;
+        this.ctm_order.deliveryNotes = orderItem.DELIVERY_NOTES;
+        this.ctm_order.deliveryType = orderItem.DELIVERY_TYPE;
+        this.ctm_order.projectNo = orderItem.PROJECT_NO;
+        this.ctm_order.postAddressModified = orderItem.POST_ADDRESS_MODIFIED;
+        this.ctm_order.allSpend = orderItem.ALL_SPEND;
+        this.ctm_order.deliveryFlag = orderItem.DELIVERY_FLAG;
+        this.ctm_order.invoiceFlag = orderItem.INVOICE_FLAG;
+        this.ctm_order.allAddress = orderItem.ALL_ADDRESS;
+      }
     }
   },
-
   created: function() {
     console.log(Cookies.get("isManager"));
+    this.getOrderHead();
     this.getProvince(); //三级联动
     this.allAddress(); //获取地址
     this.huodongjia(); //获取活动价

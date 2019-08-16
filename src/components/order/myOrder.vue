@@ -144,7 +144,7 @@
             <p>
               <el-button
                 @click="summitCurtain(item)"
-                v-if="item.CURTAIN_STATUS_ID=='0' && item.STATUS_ID=='0'"
+                v-if="(item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='4') && item.STATUS_ID=='0'"
                 size="medium"
                 type="primary"
                 plain
@@ -313,6 +313,7 @@ export default {
       }
       transCookies[0].item.groupType = "E";
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
       this.addTab("order/checkOrder");
       console.log(transCookies);
