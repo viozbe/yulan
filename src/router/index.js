@@ -22,11 +22,7 @@ import DetailCurtain from '@/components/detail/detailCurtain'
 import DetailSoftSuit from '@/components/detail/detailSoftSuit'
 import ShoppingCurtainDetail from '@/components/shops/shoppingCurtainDetail'
 import orderDetail from '@/components/order/orderDetail'
-import payment from '@/components/order/payment'
 import checkOrder from '@/components/order/checkOrder'
-import mycomplaint from '@/components/order/mycomplaint'
-import complaintResult from '@/components/order/complaintResult'
-import logistics from '@/components/order/logistics'
 import shipment from '@/components/order/shipment'
 import examine from '@/components/order/examine'
 import ExamineDetail from '@/components/order/examineDetail'
@@ -152,14 +148,6 @@ const router = new Router({
         name: 'lanJu',
         component: LanJu
       },{
-        path: '/order/mycomplaint',
-        name: 'mycomplaint',
-        component: mycomplaint
-      },{
-        path: '/order/complaintResult',
-        name: 'complaintResult',
-        component: complaintResult
-      },{
         path: '/order/orderDetail',
         name: 'orderDetail',
         component: orderDetail
@@ -179,17 +167,9 @@ const router = new Router({
         name: 'checkExamine',
         component: checkExamine
       },{
-        path: '/order/payment',
-        name: 'payment',
-        component: payment
-      },{
         path: '/order/checkOrder',
         name: 'checkOrder',
         component: checkOrder
-      },{
-        path: '/order/logistics',
-        name: 'logistics',
-        component: logistics
       },{
         path: '/order/shipment',
         name: 'shipment',

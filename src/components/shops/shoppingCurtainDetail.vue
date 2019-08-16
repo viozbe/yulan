@@ -468,6 +468,7 @@ export default {
             this.part2.forEach(item =>{
                 if(item.value === _data){
                     this.curtainData[index].unit = item.unit
+                    this.curtainData[index].note = item.note
                     this.judgeTip(this.curtainData[index],index)
                     return
                 }
@@ -540,13 +541,14 @@ export default {
                     _arr.push({
                         label: `${item.itemNo}:${item.note}`,
                         value: item.itemNo,
-                        unit: (item.unit === '°ü')?'包':item.unit
+                        unit: (item.unit === '°ü')?'包':item.unit,
+                        note: item.note
                     })
                 })
                 _arr.sort(function(a , b){
                     return (a.value>b.value)?1:-1   //升序
                 })
-                _arr.push({ label: '-未选择配件包-', value: null })
+                _arr.push({ label: '-未选择配件包-', value: null, unit: '', note: '' })
                 this.part2 = _arr
             }).catch(err =>{
                 this.part2 = []
