@@ -1456,7 +1456,7 @@ export default {
         this.getOldData(this.headerData);
         this.clearArr();
         this.getSpanArr(this.data);
-        this.suggestionLJ = this.suggestion.toString();
+        if(this.suggestion)    this.suggestionLJ = this.suggestion.toString();
     },
     deactivated:function(){
         
