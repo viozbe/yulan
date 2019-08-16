@@ -1,6 +1,12 @@
 <template>
   <el-card class="centerCard">
-    <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" width="1300px">
+    <el-dialog
+      title="窗帘详情"
+      :show-close="true"
+      :visible.sync="detailVisible"
+      width="1300px"
+      top="5vh"
+    >
       <keep-alive>
         <detailCurtainTable
           v-if="detailVisible"
@@ -73,14 +79,20 @@
           @click="_pass()"
           size="medium"
           type="success"
-        >确认审核通过</el-button>
+        >确认兰居修改</el-button>
         <el-button
           :disabled="exButton"
           v-if="check_CURTAIN_STATUS_ID==1"
           @click="LjExamine()"
           size="medium"
           type="success"
-        >修改并再次审核</el-button>
+        >确认修改</el-button>
+        <el-button
+          v-if="check_CURTAIN_STATUS_ID==0&&check_STATUS_ID==0"
+          @click="summitCurtain"
+          size="medium"
+          type="primary"
+        >提交订单</el-button>
       </div>
     </el-card>
   </el-card>
@@ -94,6 +106,7 @@ import {
   orderDetail,
   defeatChange
 } from "@/api/orderList";
+import { updateCurtainOrder } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -113,6 +126,7 @@ export default {
       renderArray: [],
       tableIndex: "",
       check_CURTAIN_STATUS_ID: "",
+      check_STATUS_ID: "",
       orderNum: "",
       detailVisible: false,
       ruleForm: {
@@ -133,8 +147,8 @@ export default {
     this.getDetail();
     this.orderNum = Cookies.get("ORDER_NO");
     console.log(Cookies.get("CURTAIN_STATUS_ID"));
-    //let CURTAIN_STATUS_ID = Cookies.get('CURTAIN_STATUS_ID');
     this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
+    this.check_STATUS_ID = Cookies.get("CYR_STATUS_ID");
   },
   methods: {
     closeTheDialog(msg) {
@@ -146,13 +160,16 @@ export default {
     },
     //获取修改后的表格数据
     getFinalData(msg) {
-      //console.log(msg[0].lineNo);
       if (msg != null) {
         this.saveChange();
       }
       let innerLine = msg[0].lineNo;
       console.log(innerLine);
       this.allCurtains.push(msg);
+      //换掉的item赋值
+      for (let i = 0; i < msg.length; i++) {
+        msg[i].itemId = msg[i].item.itemNo;
+      }
       for (let a = 0; a < this.allCurtains.length - 1; a++) {
         if (this.allCurtains[a][0].lineNo == innerLine) {
           this.allCurtains.splice(a, 1);
@@ -160,25 +177,62 @@ export default {
       }
       console.log(this.allCurtains);
     },
-    //退回兰居审核
+    summitCurtain() {
+      var item = this.ruleForm;
+      let orderBody = item.ORDERBODY;
+      let transCookies = [];
+      for (let i = 0; i < item.ORDERBODY.length; i++) {
+        transCookies[i] = new Object();
+        //预留
+        transCookies[i].width = item.ORDERBODY[i].CURTAIN_WIDTH;
+        transCookies[i].height = item.ORDERBODY[i].CURTAIN_HEIGHT;
+        transCookies[i].orderNumber = item.ORDER_NO;
+        transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
+        transCookies[i].activityId = item.ORDERBODY[i].PROMOTION_TYPE;
+        transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
+        transCookies[i].price = item.ORDERBODY[i].UNIT_PRICE;
+        transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
+        transCookies[i].activityName = item.ORDERBODY[i].PROMOTION;
+        transCookies[i].unit = "米";
+        transCookies[i].item = new Object();
+        transCookies[i].item.itemNo = item.ORDERBODY[i].ITEM_NO;
+        transCookies[i].item.note = item.ORDERBODY[i].NOTES;
+        transCookies[i].item.itemVersion = item.ORDERBODY[i].PRODUCTION_VERSION;
+        //orderType
+        transCookies[i].salPromotion = new Object();
+        transCookies[i].salPromotion.orderType =
+          item.ORDERBODY[i].PROMOTION_TYPE;
+        transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
+      }
+      transCookies[0].item.groupType = "E";
+      sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+      Cookies.set("cur_status", 3);
+      this.addTab("order/checkOrder");
+      console.log(transCookies);
+    },
+    //客户修改
     LjExamine() {
       let url = "/order/updateCurtainOrder.do";
       let data = {
         orderNo: this.orderNum,
         curtainStatusId: 0,
-        allCurtains: this.allCurtains
+        allCurtains: this.allCurtains,
+        deleteIds: this.deleteIds
       };
-      defeatChange(url, data).then(res => {
+      //defeatChange(url,data).then(res =>{
+      updateCurtainOrder(data).then(res => {
         console.log(res);
         if (res.code == 0) {
-          this.$alert("操作成功,已将该订单退回给兰居进行确认", "提示", {
+          this.$alert("操作成功,请提交结算再次审核", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
-          this.closeToTab({
-            oldUrl: "order/checkExamine",
-            newUrl: "order/myOrder"
-          });
+          // this.closeToTab({
+          //   oldUrl:'order/checkExamine',
+          //   newUrl:'order/myOrder'
+          // })
+          this.check_CURTAIN_STATUS_ID = "0";
+          this.getDetail();
         } else {
           this.$alert("操作失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
@@ -194,7 +248,7 @@ export default {
         orderNo: this.orderNum,
         curtainStatusId: "4"
       };
-      this.$confirm("确认同意兰居修改通过审核？", "提示", {
+      this.$confirm("确认同意兰居修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "info"
@@ -202,15 +256,16 @@ export default {
         passExamine(url, data).then(res => {
           console.log(res);
           if (res.code == 0) {
-            this.$alert("操作成功,该订单已经通过审核", "提示", {
+            this.$alert("操作成功,该订单已经确认可再次提交", "提示", {
               confirmButtonText: "确定",
               type: "success"
             }).then(() => {
               //this.addTab('order/myOrder');
-              this.closeToTab({
-                oldUrl: "order/checkExamine",
-                newUrl: "order/myOrder"
-              });
+              // this.closeToTab({
+              //   oldUrl:'order/checkExamine',
+              //   newUrl:'order/myOrder'
+              // })
+              this.check_CURTAIN_STATUS_ID = "0";
             });
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
@@ -227,7 +282,7 @@ export default {
         orderNo: this.orderNum,
         curtainStatusId: "3"
       };
-      this.$confirm("确定将订单退回兰居重新审核？", "提示", {
+      this.$confirm("确定将订单退回兰居重新修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "info"
@@ -384,10 +439,10 @@ export default {
   line-height: 30px;
   display: inline-block;
   margin-right: 30px;
+  font-weight: bold;
 }
 .zoomLeft {
   font-size: 15px;
-  font-weight: bold;
   display: inline-block;
   margin-right: 10px;
 }

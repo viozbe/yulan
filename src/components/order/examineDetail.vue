@@ -5,12 +5,14 @@
       :show-close="false"
       :visible.sync="detailVisible"
       :close-on-click-modal="false"
-      width="1300px"
+      width="1400px"
+      top="5vh"
     >
       <keep-alive>
         <detailCurtainTable
           v-if="detailVisible"
           v-bind:tableStatus="1"
+          v-bind:STATUS_ID="STATUS_ID"
           v-bind:isModified="isModified"
           v-bind:headerData="headerData"
           v-bind:curtainData="curtainData"
@@ -88,6 +90,7 @@ import {
   orderDetail,
   defeatChange
 } from "@/api/orderList";
+import { updateCurtainOrder } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -111,6 +114,7 @@ export default {
       passORnot: true,
       detailVisible: false,
       ctmOrderDetails: [],
+      STATUS_ID: "",
       //advanceVisible:false,
       //advance:'',
       ruleForm: {
@@ -217,6 +221,7 @@ export default {
       console.log(tab.curtains);
       this.tableIndex = index;
       this.cyLineNo = index + 1;
+      this.STATUS_ID = tab.STATUS_ID;
       //拿到保存的建议
       for (let i = 0; i < this.ctmOrderDetails.length; i++) {
         if (this.ctmOrderDetails[i].lineNo == this.cyLineNo) {
@@ -277,7 +282,8 @@ export default {
         ctmOrderDetails: this.ctmOrderDetails,
         deleteIds: this.deleteIds
       };
-      defeatChange(url, data).then(res => {
+      //defeatChange(url, data).then(res => {
+      updateCurtainOrder(data).then(res => {
         console.log(res);
         if (res.code == 0) {
           this.$alert("操作成功,已将该订单退回给用户进行确认", "提示", {
@@ -348,8 +354,8 @@ export default {
         data.allCurtains.push(array);
       } */
       console.log(data.allCurtains);
-      // console.log(data);
-      defeatChange(url, data).then(res => {
+      //defeatChange(url, data).then(res => {
+      updateCurtainOrder(data).then(res => {
         console.log(res);
         if (res.code == 0) {
           this.$alert("操作成功,已将该订单退回给用户修改", "提示", {
@@ -448,10 +454,10 @@ export default {
   line-height: 30px;
   display: inline-block;
   margin-right: 30px;
+  font-weight: bold;
 }
 .zoomLeft {
   font-size: 15px;
-  font-weight: bold;
   display: inline-block;
   margin-right: 10px;
 }

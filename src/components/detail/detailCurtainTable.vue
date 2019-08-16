@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-card shadow="hover">
-            <el-table style="width:100%; max-width: 1200px;" border
+            <el-table style="width:100%;" border
                 :data="data"
                 :span-method="cellMerge">
                 <el-table-column
@@ -48,10 +48,10 @@
                 </el-table-column>
                 <el-table-column label="名称"
                     header-align="center"
-                    width="60">
+                    width="90">
                     <template slot-scope="scope">
                         {{getTypeName(scope.row.curtainPartName)}}
-                        <br>
+                        <!-- <br> -->
                         <span v-if="tableStatus !== 3">
                             <el-checkbox @change="changeLink('lt',0)" v-if="scope.row.itemType === 'lt'" v-model="chooseBig[0]">
                                 <span v-if="chooseBig[0] == false" style="color: red;">×</span>
@@ -136,7 +136,7 @@
                 </el-table-column>
                 <el-table-column label="名称" 
                     header-align="center"
-                    width="100">
+                    width="130">
                     <template slot-scope="scope">
                         <div v-if="scope.row.curtainItemName !== null">{{scope.row.curtainItemName}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
@@ -174,7 +174,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="用量"
-                    width="95"
+                    width="100"
                     header-align="center">
                     <template slot-scope="scope">
                         <span v-if="tableStatus === 3">
@@ -185,6 +185,11 @@
                             <el-input
                                 style="width: 75%;"
                                 size="mini"
+                                oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
                                 v-model="scope.row.dosage">
                             </el-input>
                             {{(scope.row.dosage === '')?'':scope.row.unit}}
@@ -194,6 +199,11 @@
                             <el-input
                                 style="width: 75%;"
                                 size="mini"
+                                oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
                                 v-model="scope.row.dosage">
                             </el-input>
                             {{(scope.row.dosage === '')?'':scope.row.unit}}
@@ -370,6 +380,7 @@
                     v-model="suggestionLJ">
                 </el-input>
                 <el-button type="success" class="mr20" width="130px"
+                    :disabled="STATUS_ID=='0'"
                     @click.native="resolvePass">
                     确认通过
                 </el-button>
@@ -546,7 +557,7 @@ export default {
             suggestionLJ: '',   //兰居人员总体审核意见
         }
     },
-    props: ['headerData','curtainData','tableStatus','suggestion','isModified'],
+    props: ['headerData','curtainData','tableStatus','suggestion','isModified','STATUS_ID'],
     methods:{
         //修改配件包时，对应修改单位以及名称说明
         changePJBUnit(index){
