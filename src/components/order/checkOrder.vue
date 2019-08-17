@@ -1467,7 +1467,7 @@ export default {
   border-radius: 15px; /*圆角的大小 */
 }
 .cctv {
-  background: url("coupon.png");
+  background: url("../../../static/coupon.png");
   width: 350px;
   height: 230px;
   margin-right: 10%;
@@ -1486,7 +1486,7 @@ export default {
   margin-top: 5px;
 }
 .logo {
-  background: url("logopng.png");
+  background: url("../../../static/logopng.png");
   width: 40px;
   height: 40px;
   background-size: 100%;

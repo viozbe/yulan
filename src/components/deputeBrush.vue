@@ -90,7 +90,6 @@ export default {
       assignments: "",
       assignmentsTarget: "",
       assignmentsReduce: "",
-      tableHead: "",
       tableHead1: "",
       tableHead2: "",
       tableHead3: ""
@@ -197,7 +196,7 @@ export default {
         this.tableData = zoom;
         this.assignments = res.data.assignments.assignments;
         this.assignmentsTarget = res.data.assignments.assignmentsTarget;
-        this.assignmentsReduce = this.assignmentsTarget - reduce;
+        this.assignmentsReduce = (this.assignmentsTarget - reduce).toFixed(2);
         this.tHead();
       });
     },
@@ -212,7 +211,7 @@ export default {
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //表头
     tHead() {
-      this.tableHead = `协议月任务：${this.assignments}\xa0\xa0\xa0\xa0\xa0\xa0\xa0本月促销目标任务：${this.assignmentsTarget}\xa0\xa0\xa0\xa0\xa0\xa0\xa0任务完成差额：${this.assignmentsReduce}`;
+      //this.tableHead = `协议月任务：${this.assignments}\xa0\xa0\xa0\xa0\xa0\xa0\xa0本月促销目标任务：${this.assignmentsTarget}\xa0\xa0\xa0\xa0\xa0\xa0\xa0任务完成差额：${this.assignmentsReduce}`;
       this.tableHead1 = `协议月任务：${this.assignments}`;
       this.tableHead2 = `本月促销目标任务：${this.assignmentsTarget}`;
       this.tableHead3 = `任务完成差额：${this.assignmentsReduce}`;
