@@ -41,7 +41,7 @@ export function get(url,params={},urlType){
     }
     return new Promise((resolve,reject) => {
         Axios.get(url,{
-            params:params
+            params:params,
         })
         .then(response => {
             if(response.data.code === CODE_OK || response.data.success){

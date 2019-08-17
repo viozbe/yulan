@@ -28,6 +28,10 @@ Vue.prototype.$put=put;
 
 //请求拦截
 Axios.interceptors.request.use(config => {
+  //解决IE请求缓存
+  if(config.method === 'get'){
+    config.params.tForIE = new Date()
+  }
   //一个取巧的方法，之后看能怎么优化
   if(config.url !== '/item/getGYList.do' && config.url !== '/salPromotion/selectSalPromotion.do')
     showFullScreenLoading();
