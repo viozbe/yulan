@@ -521,19 +521,19 @@ export default {
 <style scoped>
 @media (min-width: 1920px) {
     .center{
-        width: 1400px;
+        width: 1600px;
         margin: 0 auto;
     }
 }
 @media (max-width: 1920px) {
     .center{
-        width: 1400px;
+        width: 1600px;
         margin: 0 auto;
     }
 }
 @media (max-width: 1680px) {
     .center{
-        width: 1400px;
+        width: 1500px;
         margin: 0 auto;
     }
 } 

@@ -25,7 +25,7 @@
       <span class="headSpan">订单详情</span>
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain>返回</el-button>
     </div>
-    <el-card class="tableCard" shadow="hover">
+    <el-card class="tableCard" shadow="hover" body-style="padding:1px">
       <div slot="header">
         <span class="zoomLeft">
           订单号：
@@ -33,11 +33,27 @@
         </span>
         <span class="zoomLeft">
           经办人：
-          <span class="zoomRight">{{ruleForm.LINKPERSON}}</span>
+          <span class="zoomRight">{{ruleForm.LINKPERSON}}({{ruleForm.TELEPHONE}})</span>
         </span>
         <span class="zoomLeft">
-          联系方式：
-          <span class="zoomRight">{{ruleForm.TELEPHONE}}</span>
+          收货人：
+          <span class="zoomRight">{{ruleForm.WL_CONTACTS}}({{ruleForm.WL_TEL}})</span>
+        </span>
+        <br />
+        <span class="zoomLeft">
+          收货地址：
+          <span
+            class="zoomRight"
+          >{{ruleForm.RECIVER_AREA1}}{{ruleForm.RECIVER_AREA2}}{{ruleForm.RECIVER_AREA3}}{{ruleForm.POST_ADDRESS}}</span>
+        </span>
+        <span class="zoomLeft">
+          订单备注：
+          <span class="zoomRight">{{ruleForm.NOTES}}</span>
+        </span>
+        <br />
+        <span class="zoomLeft">
+          玉兰处理说明：
+          <span class="zoomRight">{{ruleForm.YULAN_NOTES}}</span>
         </span>
       </div>
       <el-table
@@ -46,27 +62,63 @@
         style="width: 100%"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column align="center" prop="ITEM_NO" label="型号"></el-table-column>
-        <el-table-column align="center" prop="BRAND_NAME" label="品牌"></el-table-column>
-        <el-table-column align="center" prop="NOTE" label="类型"></el-table-column>
-        <el-table-column align="center" prop="QTY_REQUIRED" label="数量"></el-table-column>
-        <el-table-column prop="PROMOTION" align="center" label="活动类型"></el-table-column>
+        <el-table-column align="center" prop="ITEM_NO" label="型号" width="140"></el-table-column>
+        <el-table-column align="center" label="经销单价" width="100">
+          <template slot-scope="scope1">
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
+            <span v-else>{{scope1.row.UNIT_PRICE |priceFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="QTY_REQUIRED" label="数量" width="60"></el-table-column>
+        <el-table-column prop="PROMOTION" align="center" label="活动类型" width="90"></el-table-column>
+        <el-table-column
+          prop="PART_SEND_ID"
+          align="center"
+          :formatter="formatRole"
+          label="发货说明"
+          width="90"
+        ></el-table-column>
+        <el-table-column align="center" label="折后金额" width="100">
+          <template slot-scope="scope1">
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
+            <span v-else>{{scope1.row.PROMOTION_COST}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="年返利使用金额" width="100">
+          <template slot-scope="scope1">
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
+            <span v-else>{{scope1.row.BACK_Y}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="BACK_M" align="center" label="月返利使用金额" width="100">
+          <template slot-scope="scope1">
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
+            <span v-else>{{scope1.row.BACK_M}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="应付金额" width="100">
+          <template slot-scope="scope1">
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
+            <span v-else>{{scope1.row.FINAL_COST}}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
-        <el-table-column prop="LJ_SUGGESTION" align="center" label="兰居备注"></el-table-column>
-        <el-table-column align="center" label="详情">
+        <el-table-column v-if="isX" prop="LJ_SUGGESTION" align="center" label="兰居备注"></el-table-column>
+        <el-table-column v-if="isX" align="center" label="窗帘详情" width="100">
           <template slot-scope="scope">
-            <el-button @click="openDialog(scope.row,scope.$index)" type="primary" size="small">查看详情</el-button>
+            <el-button @click="openDialog(scope.row,scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
         <el-table-column
-          v-if="check_CURTAIN_STATUS_ID==1"
+          v-if="check_CURTAIN_STATUS_ID==1 && isX"
           align="center"
           prop="checkStatus"
           label="是否修改"
+          width="80"
         ></el-table-column>
       </el-table>
 
-      <div style="float:right;margin-top:20px;height:100px;">
+      <div style="float:right;margin-top:20px;margin-right:10px;height:100px;">
         <!-- <p>商品总价格：<span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span></p><br> -->
         <el-button
           v-if="check_CURTAIN_STATUS_ID==2"
@@ -88,10 +140,17 @@
           type="success"
         >确认修改</el-button>
         <el-button
-          v-if="(check_CURTAIN_STATUS_ID==0||check_CURTAIN_STATUS_ID==4)&&check_STATUS_ID==0"
+          v-if="((check_CURTAIN_STATUS_ID==0||check_CURTAIN_STATUS_ID==4)&&check_STATUS_ID==0)"
           @click="summitCurtain"
           size="medium"
           type="primary"
+        >提交订单</el-button>
+        <el-button
+          v-if="check_STATUS_ID==5||check_STATUS_ID==6"
+          @click="refreshPay()"
+          size="medium"
+          type="danger"
+          plain
         >提交订单</el-button>
       </div>
     </el-card>
@@ -104,7 +163,9 @@ import {
   getOrderlist,
   passExamine,
   orderDetail,
-  defeatChange
+  defeatChange,
+  queryCash,
+  payAgain
 } from "@/api/orderList";
 import { updateCurtainOrder } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
@@ -122,9 +183,12 @@ export default {
       cyLineNo: 0,
       allCurtains: [],
       headerData: {},
+      isX: false,
       curtainData: "",
+      Initial_balance: 0,
       renderArray: [],
       tableIndex: "",
+      isManager: Cookies.get("isManager"),
       check_CURTAIN_STATUS_ID: "",
       check_STATUS_ID: "",
       orderNum: "",
@@ -143,14 +207,35 @@ export default {
   components: {
     DetailCurtainTable
   },
+  filters: {
+    priceFilter(value) {
+      //四舍五入过滤大法
+      let realVal = parseFloat(value).toFixed(2);
+      //防止出现-0.00；
+      if (realVal <= 0) {
+        realVal = 0.0;
+      }
+
+      return realVal;
+    }
+  },
   created: function() {
-    this.getDetail();
+    this.queryMoney();
     this.orderNum = Cookies.get("ORDER_NO");
+    this.isX = this.orderNum.slice(0, 1) == "X";
     console.log(Cookies.get("CURTAIN_STATUS_ID"));
     this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
-    this.check_STATUS_ID = Cookies.get("CYR_STATUS_ID");
+    this.check_STATUS_ID = Cookies.get("status_ID");
+    this.getDetail();
   },
   methods: {
+    formatRole: function(row, column) {
+      if (row.PART_SEND_ID == 0) {
+        return "等生产";
+      } else if (row.PART_SEND_ID == 1) {
+        return "分批发货";
+      } else return "--";
+    },
     closeTheDialog(msg) {
       this.detailVisible = msg;
     },
@@ -402,6 +487,47 @@ export default {
         this.addTab("order/myOrder");
       }
     },
+    //余额判断
+    queryMoney() {
+      var url = "/order/getResidemoney.do";
+      var data = {
+        cid: Cookies.get("cid"),
+        companyId: Cookies.get("companyId")
+      };
+      queryCash(url, data).then(res => {
+        console.log(res);
+        this.Initial_balance = res.data;
+        console.log(this.Initial_balance);
+      });
+    },
+    refreshPay() {
+      let url = "/order/putAgainOrder.do";
+      let data = {
+        cid: Cookies.get("cid"),
+        orderNo: Cookies.get("ORDER_NO")
+      };
+      console.log(data);
+      if (
+        this.ruleForm.ALL_SPEND > this.Initial_balance &&
+        this.check_STATUS_ID == 5
+      ) {
+        //欠款可提交的话可以跳过判断
+        this.$alert("余额不足，请尽快充值", "提示", {
+          confirmButtonText: "确定",
+          type: "warning"
+        });
+      } else {
+        payAgain(url, data).then(res => {
+          this.$alert("提交成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success"
+          });
+          console.log(res);
+          this.addTab("order/myOrder");
+          this.closeTab("order/orderDetail");
+        });
+      }
+    },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex % 2 == 0) {
@@ -435,7 +561,6 @@ export default {
   color: black;
 }
 .zoomRight {
-  font-weight: 400;
   font-size: 15px;
   line-height: 30px;
   display: inline-block;
@@ -444,6 +569,7 @@ export default {
 }
 .zoomLeft {
   font-size: 15px;
+  line-height: 30px;
   display: inline-block;
   margin-right: 10px;
 }
@@ -451,5 +577,8 @@ export default {
 <style>
 .el-table .success-row {
   background: #f0f9eb;
+}
+.centerCard .el-dialog__body {
+  padding: 10px;
 }
 </style>

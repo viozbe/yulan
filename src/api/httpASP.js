@@ -1,22 +1,8 @@
 import Axios from 'axios'
 
 const CODE_OK = 0;
-Axios.defaults.baseURL = 'http://14.29.223.114:10250/yulan-order';
-//Axios.defaults.baseURL = 'http://106.14.159.244:8080/yulan-capital';
-Axios.defaults.withCredentials = true;
-// Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-//Axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded';
-/* 添加一个请求拦截器
-Axios.interceptors.request.use(function (config) {  
-    if(config.method=="post" || config.method=="put"){
-        config.data=qs.stringify(config.data);
-    }
-    return config;
-}, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-});
-*/
+//var baseUrl = 'http://localhost:49438/';
+var baseUrl = 'http://47.107.56.156:568/';
 
 /**
  * 封装get方法
@@ -25,12 +11,14 @@ Axios.interceptors.request.use(function (config) {
  * @returns {Promise} 
  */
 export function get(url,params={}){
+    Axios.defaults.withCredentials = false;
     return new Promise((resolve,reject) => {
-        Axios.get(url,{
+        Axios.get(baseUrl + url,{
             params:params,
         })
         .then(response => {
-            if(response.data.code === CODE_OK){
+            Axios.defaults.withCredentials = true;
+            if(response.data.code === CODE_OK || response.data.success){
                 resolve(response.data);
             }
             else{
@@ -38,6 +26,7 @@ export function get(url,params={}){
             }
         })
         .catch(err => {
+            Axios.defaults.withCredentials = true;
             reject(err)
         })
     })
@@ -49,10 +38,12 @@ export function get(url,params={}){
  * @returns {Promise}
  */
 export function post(url,data = {}){
+    Axios.defaults.withCredentials = false;
     return new Promise((resolve,reject) => {
-        Axios.post(url,data)
+        Axios.post(baseUrl + url,data)
         .then(response => {
-            if(response.data.code === CODE_OK){
+            Axios.defaults.withCredentials = true;
+            if(response.data.code === CODE_OK || response.data.success){
                 resolve(response.data);
             }
             else{
@@ -60,11 +51,9 @@ export function post(url,data = {}){
             }
         })
         .catch( error => {
+            Axios.defaults.withCredentials = true;
             reject(error);
         })
-        // ,err => {
-        //         reject(err)
-        //     })
     })
 }
 /**
@@ -74,10 +63,12 @@ export function post(url,data = {}){
  * @returns {Promise}
  */
 export function patch(url,data = {}){
+    Axios.defaults.withCredentials = false;
     return new Promise((resolve,reject) => {
-        Axios.patch(url,data)
+        Axios.patch(baseUrl + url,data)
         .then(response => {
-            if(response.data.code === CODE_OK){
+            Axios.defaults.withCredentials = true;
+            if(response.data.code === CODE_OK || response.data.success){
                 resolve(response.data);
             }
             else{
@@ -85,11 +76,9 @@ export function patch(url,data = {}){
             }
         })
         .catch(error => {
+            Axios.defaults.withCredentials = true;
             reject(error);
         })
-            // ,err => {
-            //     reject(err)
-            // })
     })
 }
 /**
@@ -99,16 +88,19 @@ export function patch(url,data = {}){
  * @returns {Promise}
  */
 export function put(url,data = {}){
+    Axios.defaults.withCredentials = false;
     return new Promise((resolve,reject) => {
-        Axios.put(url,data)
+        Axios.put(baseUrl + url,data)
             .then(response => {
-                if(response.data.code === CODE_OK){
+                Axios.defaults.withCredentials = true;
+                if(response.data.code === CODE_OK || response.data.success){
                     resolve(response.data);
                 }
                 else{
                     reject(response.data);
                 }
             },err => {
+                Axios.defaults.withCredentials = true;
                 reject(err)
             })
     })
