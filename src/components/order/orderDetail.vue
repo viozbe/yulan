@@ -128,7 +128,6 @@ export default {
       detailVisible: false,
       curtainData: "",
       headerData: {},
-
       isX: false,
       isW: false,
       isManager: Cookies.get("isManager"),
@@ -173,7 +172,6 @@ export default {
       this.isX = true;
     }
     this.queryMoney();
-    //this.refresh();
     this.getDetail();
   },
   methods: {
@@ -334,6 +332,7 @@ export default {
 }
 .zoomLeft {
   font-size: 15px;
+  line-height: 30px;
   display: inline-block;
   margin-right: 10px;
 }

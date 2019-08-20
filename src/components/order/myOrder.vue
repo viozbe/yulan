@@ -6,12 +6,11 @@
         v-model="activeName"
         @tab-click="handleClick"
       >
-        <el-tab-pane label="全部订单" name></el-tab-pane>
-        <el-tab-pane label="已提交" name="1"></el-tab-pane>
-        <el-tab-pane label="已接收" name="12"></el-tab-pane>
-        <el-tab-pane label="已受理" name="2"></el-tab-pane>
-        <el-tab-pane label="已作废" name="3"></el-tab-pane>
-        <el-tab-pane label="窗帘待处理" name="90"></el-tab-pane>
+        <el-tab-pane label="待处理" name="pending"></el-tab-pane>
+        <el-tab-pane label="窗帘审核订单" name="LJPending"></el-tab-pane>
+        <el-tab-pane label="生效订单" name="YLPending"></el-tab-pane>
+        <el-tab-pane label="已作废" name="invalid"></el-tab-pane>
+        <el-tab-pane label="全部订单" name="allOrder"></el-tab-pane>
       </el-tabs>
       <a target="_blank" style="float:right;" href="http://www.luxlano.com/ddkc/">玉兰·兰居尚品->订单及库存查询</a>
     </div>
@@ -33,7 +32,15 @@
         v-model="date2"
         style="width:14%;"
       ></el-date-picker>
-      <el-select v-model="CommodityType" placeholder="请选择商品类型">
+      <el-select style="width:160px;" v-model="CommodityType" placeholder="请选择商品类型">
+        <el-option
+          v-for="item in commodityTypeOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+      <el-select style="width:160px;" v-model="orderStatus" placeholder="请选择审核状态">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -45,7 +52,7 @@
         @keyup.enter.native="search()"
         placeholder="请输入相关信息搜索订单"
         v-model="find"
-        style="width:300px;"
+        style="width:280px;"
       >
         <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
@@ -130,35 +137,31 @@
         </div>
         <div class="buttonDiv">
           <p style="width:100px; font-size:18px; color:tomato; text-align:center;">{{item.status}}</p>
-          <router-link to="/order/orderDetail">
-            <p>
-              <el-button
-                v-show="detailShow"
-                @click="toOrderDetail(item.ORDER_NO,item.STATUS_ID)"
-                size="medium"
-                type="success"
-              >订单详情</el-button>
-            </p>
-          </router-link>
           <router-link to="/order/checkOrder">
             <p>
               <el-button
                 @click="summitCurtain(item)"
-                v-if="(item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='4') && item.STATUS_ID=='0'"
+                v-if="((item.CURTAIN_STATUS_ID==0||item.CURTAIN_STATUS_ID==4) && item.STATUS_ID==0)"
                 size="medium"
                 type="primary"
                 plain
               >提交订单</el-button>
             </p>
           </router-link>
+          <el-button
+            v-if="item.STATUS_ID==5||item.STATUS_ID==6"
+            @click="refreshPay(item)"
+            size="medium"
+            type="danger"
+            plain
+          >提交订单</el-button>
           <router-link to="/order/checkExamine">
             <p>
               <el-button
                 @click="toCheckExamine(item.ORDER_NO,item.CURTAIN_STATUS_ID,item.STATUS_ID)"
-                v-if="item.CURTAIN_STATUS_ID=='0'||item.CURTAIN_STATUS_ID=='1'||item.CURTAIN_STATUS_ID=='2'||item.CURTAIN_STATUS_ID=='3'||item.CURTAIN_STATUS_ID=='4'"
                 size="medium"
-                type="danger"
-              >审核详情</el-button>
+                type="success"
+              >订单详情</el-button>
             </p>
           </router-link>
         </div>
@@ -168,8 +171,9 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]"
           :page-size="limit"
-          layout="prev, pager, next, jumper"
+          layout="total,sizes, prev, pager, next, jumper"
           :total="count"
         ></el-pagination>
       </div>
@@ -179,7 +183,8 @@
 
 <script>
 import { getOrderlist, passExamine } from "@/api/orderList";
-import { cancelOrder } from "@/api/orderList";
+import { getAllOrders } from "@/api/orderListASP";
+import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -193,13 +198,16 @@ export default {
       date2: "",
       find: "",
       CommodityType: "",
+      orderStatus: "",
       state_id: "",
-      activeName: "",
-      limit: 4,
-      count: 2,
+      activeName: "pending",
+      limit: 5,
+      count: 0,
       currentPage: 1,
+      Initial_balance: 0,
       buttonShow: true,
-      options: [
+      statusIdOptionValue1: ["0", "5", "6", "21", "22"],
+      commodityTypeOptions: [
         {
           label: "墙纸配套类",
           value: "W"
@@ -213,7 +221,142 @@ export default {
           value: "Y"
         }
       ],
-      detailShow: true
+      options: [
+        {
+          label: "待提交",
+          value: "0"
+        },
+        {
+          label: "余额不足待提交",
+          value: "5"
+        },
+        {
+          label: "余额不足可提交",
+          value: "6"
+        },
+        {
+          label: "待确认",
+          value: "22"
+        },
+        {
+          label: "待修改",
+          value: "21"
+        }
+      ],
+      options1: [
+        {
+          label: "待提交",
+          value: "0"
+        },
+        {
+          label: "余额不足待提交",
+          value: "5"
+        },
+        {
+          label: "余额不足可提交",
+          value: "6"
+        },
+        {
+          label: "待确认",
+          value: "22"
+        },
+        {
+          label: "待修改",
+          value: "21"
+        }
+      ],
+      options2: [
+        {
+          label: "待审核",
+          value: "20"
+        },
+        {
+          label: "兰居待修改",
+          value: "23"
+        }
+      ],
+      options3: [
+        {
+          label: "已提交",
+          value: "1"
+        },
+        {
+          label: "已接收",
+          value: "12"
+        },
+        {
+          label: "已受理",
+          value: "2"
+        },
+        {
+          label: "部分发货",
+          value: "4"
+        },
+        {
+          label: "已完成",
+          value: "7"
+        }
+      ],
+      options4: [
+        {
+          label: "已作废",
+          value: "3"
+        }
+      ],
+      options5: [
+        {
+          label: "待提交",
+          value: "0"
+        },
+        {
+          label: "余额不足待提交",
+          value: "5"
+        },
+        {
+          label: "余额不足可提交",
+          value: "6"
+        },
+        {
+          label: "待确认",
+          value: "22"
+        },
+        {
+          label: "待修改",
+          value: "21"
+        },
+        {
+          label: "待审核",
+          value: "20"
+        },
+        {
+          label: "兰居待修改",
+          value: "23"
+        },
+        {
+          label: "已提交",
+          value: "1"
+        },
+        {
+          label: "已接收",
+          value: "12"
+        },
+        {
+          label: "已受理",
+          value: "2"
+        },
+        {
+          label: "部分发货",
+          value: "4"
+        },
+        {
+          label: "已完成",
+          value: "7"
+        },
+        {
+          label: "已作废",
+          value: "3"
+        }
+      ]
     };
   },
   activated: function() {
@@ -322,7 +465,7 @@ export default {
     toCheckExamine(value, ID, status) {
       Cookies.set("ORDER_NO", value);
       Cookies.set("CURTAIN_STATUS_ID", ID);
-      Cookies.set("CYR_STATUS_ID", status);
+      Cookies.set("status_ID", status);
       this.addTab("order/checkExamine");
     },
     //订单详情
@@ -335,24 +478,52 @@ export default {
     },
     //订单获取
     refresh() {
-      var url = "/order/getOrders.do";
+      // var url = "/order/getOrders.do";
+      // var data = {
+      //   companyId: Cookies.get("companyId"),
+      //   limit: "4",
+      //   page: this.currentPage /* .toString(), */,
+      //   cid: Cookies.get("cid"),
+      //   state_id: this.state_id,
+      //   find: this.find /* "W1610030066", */,
+      //   beginTime: this.date1,
+      //   finishTime: this.date2,
+      //   orderType: this.CommodityType,
+      //   curtainStatusId: ""
+      // };
+      // if (this.date1 != "" || this.date2 != "") {
+      //   data.beginTime = this.date1 + " 00:00:00";
+      //   data.finishTime = this.date2 + " 23:59:59";
+      // }
+      // getOrderlist(url, data).then(res => {
+      //   console.log(res);
+      //   this.count = res.count;
+      //   console.log(res.count);
+      //   this.data = [];
+      //   this.data = res.data;
+      //   console.log(this.data);
+      // });
+      //新后台
       var data = {
         companyId: Cookies.get("companyId"),
-        limit: "4",
-        page: this.currentPage /* .toString(), */,
+        limit: this.limit,
+        page: this.currentPage,
         cid: Cookies.get("cid"),
-        state_id: this.state_id,
-        find: this.find /* "W1610030066", */,
+        statusId: this.orderStatus || this.statusIdOptionValue1,
+        find: this.find,
         beginTime: this.date1,
         finishTime: this.date2,
-        orderType: this.CommodityType,
-        curtainStatusId: ""
+        orderType: this.CommodityType
       };
-      if (this.date1 != "" || this.date2 != "") {
-        data.beginTime = this.date1 + " 00:00:00";
-        data.finishTime = this.date2 + " 23:59:59";
+      if (!data.beginTime) {
+        data.beginTime = "0001/1/1";
       }
-      getOrderlist(url, data).then(res => {
+      if (!data.finishTime) {
+        data.finishTime = "9999/12/31";
+      } else {
+        data.finishTime = data.finishTime + " 23:59:59";
+      }
+      getAllOrders(data).then(res => {
         console.log(res);
         this.count = res.count;
         console.log(res.count);
@@ -377,33 +548,52 @@ export default {
     handleClick(tab) {
       console.log(tab);
       var tabName = tab.name;
-      if (tabName == "90") {
-        this.state_id = 0;
-        this.detailShow = false;
-      } else {
-        this.state_id = tabName;
-        this.detailShow = true;
-      }
-      console.log(this.state_id);
+      this.orderStatus = "";
+      this.CommodityType = "";
       this.currentPage = 1;
+      switch (tabName) {
+        case "pending":
+          this.options = this.options1;
+          this.statusIdOptionValue1 = ["0", "5", "6", "21", "22"];
+          this.isAll = false;
+          break;
+        case "LJPending":
+          this.options = this.options2;
+          this.statusIdOptionValue1 = ["20", "23"];
+          this.isAll = false;
+          break;
+        case "YLPending":
+          this.options = this.options3;
+          this.statusIdOptionValue1 = ["1", "2", "4", "7", "12"];
+          this.isAll = false;
+          break;
+        case "invalid":
+          this.options = this.options4;
+          this.statusIdOptionValue1 = ["3"];
+          this.isAll = false;
+          break;
+        case "allOrder":
+          this.options = this.options5;
+          this.statusIdOptionValue1 = [];
+          this.isAll = true;
+          break;
+      }
       this.refresh();
     },
     //搜索
     search() {
       this.currentPage = 1;
-      //console.log(this.CommodityType);
       this.refresh();
-      //console.log(this.find)
     },
     //页面条数
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      this.limit = val;
+      this.currentPage = 1;
+      this.refresh();
     },
     //翻页获取订单
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
       this.currentPage = val;
-      console.log(this.currentPage);
       this.refresh();
     },
     //删除订单
@@ -419,7 +609,6 @@ export default {
       })
         .then(() => {
           cancelOrder(url, data).then(res => {
-            console.log(res);
             this.refresh();
             this.$alert("删除成功", "提示", {
               confirmButtonText: "确定",
@@ -431,6 +620,40 @@ export default {
         .catch(() => {
           console.log("还没删");
         });
+    },
+    //余额判断
+    queryMoney() {
+      var url = "/order/getResidemoney.do";
+      var data = {
+        cid: Cookies.get("cid"),
+        companyId: Cookies.get("companyId")
+      };
+      queryCash(url, data).then(res => {
+        this.Initial_balance = res.data;
+      });
+    },
+    refreshPay(item) {
+      let url = "/order/putAgainOrder.do";
+      let data = {
+        cid: Cookies.get("cid"),
+        orderNo: item.ORDER_NO
+      };
+      console.log(data);
+      if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
+        //欠款可提交的话可以跳过判断
+        this.$alert("余额不足，请尽快充值", "提示", {
+          confirmButtonText: "确定",
+          type: "warning"
+        });
+      } else {
+        payAgain(url, data).then(res => {
+          this.$alert("提交成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success"
+          });
+          this.refresh();
+        });
+      }
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
@@ -447,11 +670,8 @@ export default {
   },
   //生命周期
   created() {
+    this.queryMoney();
     this.refresh();
-    console.log(Cookies.get("cid"));
-    // this.$router.push({
-    //   name:`myOrder`
-    // });
   }
 };
 </script>

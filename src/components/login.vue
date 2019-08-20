@@ -23,8 +23,7 @@
                         type="password"
                         style="width:327px;"
                         placeholder="请输入密码"
-                        v-model="password"
-                        @keyup.enter.native="loginSubmit">
+                        v-model="password">
                         <img slot="prefix" src="../assets/img/password.png" width="22" alt="">
                     </el-input>
                 </div>

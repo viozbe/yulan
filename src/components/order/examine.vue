@@ -43,7 +43,7 @@
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card v-for="(item,index) of data" :key="index">
+      <el-card style="position:relative;" v-for="(item,index) of data" :key="index">
         <div slot="header">
           <i
             style="float: right;color:#20a0ff;line-height: 35px;cursor: pointer;"
@@ -144,8 +144,9 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]"
           :page-size="limit"
-          layout="prev, pager, next, jumper"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="count"
         ></el-pagination>
       </div>
@@ -175,6 +176,7 @@ export default {
       count: 2,
       currentPage: 1,
       buttonShow: true,
+      isAll: false,
       canOptionValue: ["0", "3"],
       options: [
         {
@@ -306,13 +308,13 @@ export default {
     //订单详情
     toExamineDetail(val) {
       Cookies.set("ORDER_NO", val);
-      console.log(Cookies.get("ORDER_NO"));
+      //console.log(Cookies.get("ORDER_NO"));
       this.addTab("order/examineDetail");
     },
     toCheckExamine(val) {
       Cookies.set("ORDER_NO", val);
       Cookies.set("CURTAIN_STATUS_ID", -1);
-      Cookies.set("CYR_STATUS_ID", -2);
+      Cookies.set("status_ID", -2);
       this.addTab("order/checkExamine");
     },
     //[新]获取审核订单
@@ -356,14 +358,14 @@ export default {
     //   });
     // },
     getorderList() {
-      let url = "/order/gatAllCurOrders.do";
       let data = {
         limit: this.limit,
         page: this.currentPage,
         find: this.find,
         beginTime: this.date1,
         finishTime: this.date2,
-        curtainStatusId: this.orderType || this.canOptionValue
+        curtainStatusId: this.orderType || this.canOptionValue,
+        isAll: this.isAll
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -390,19 +392,23 @@ export default {
         case "unCheck":
           this.options = this.options1;
           this.canOptionValue = ["0", "3"];
+          this.isAll = false;
           break;
         case "customCheck":
           this.options = this.options2;
-          this.canOptionValue = ["1", "2","8"];
+          this.canOptionValue = ["1", "2", "8"];
+          this.isAll = false;
           break;
         case "checked":
           this.options = this.options3;
           this.canOptionValue = ["4"];
+          this.isAll = false;
           break;
         case "allOrder":
           this.options = this.options4;
           //this.canOptionValue = ["0","1", "2", "3","4"];
           this.canOptionValue = [];
+          this.isAll = true;
           break;
       }
       this.getorderList();
@@ -414,13 +420,13 @@ export default {
     },
     //页面条数
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      this.limit = val;
+      this.currentPage = 1;
+      this.getorderList();
     },
     //翻页获取订单
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
       this.currentPage = val;
-      console.log(this.currentPage);
       this.getorderList();
     },
     ...mapMutations("navTabs", ["addTab"]),
@@ -459,7 +465,7 @@ export default {
   //生命周期
   created() {
     this.getorderList();
-    console.log(Cookies.get("cid"));
+    //console.log(Cookies.get("cid"));
   },
   activated: function() {
     this.getorderList();

@@ -1331,7 +1331,7 @@ export default {
 #curtainTable tr td{ padding: 6px 3px; }
 #shoppingMsg>p{ margin: 20px auto; }
 .messageBox>div{
-    padding: 15px 0;
+    padding: 10px 0;
 }
 .messageInput{
     border: 1px solid #c3c3c3;

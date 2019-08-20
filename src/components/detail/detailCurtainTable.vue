@@ -136,7 +136,7 @@
                 </el-table-column>
                 <el-table-column label="名称" 
                     header-align="center"
-                    width="130">
+                    width="140">
                     <template slot-scope="scope">
                         <div v-if="scope.row.curtainItemName !== null">{{scope.row.curtainItemName}}</div>
                         <div v-else>{{getTypeName(scope.row.itemType)}}</div>
@@ -1485,7 +1485,7 @@ export default {
 #curtainTable tr td{ padding: 6px 3px; }
 #shoppingMsg>p{ margin: 20px auto; }
 .messageBox>div{
-    padding: 15px 0;
+    padding: 10px 0;
 }
 .messageInput{
     border: 1px solid #c3c3c3;
