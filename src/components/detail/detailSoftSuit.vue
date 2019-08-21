@@ -46,6 +46,10 @@
                         <td>{{data.item.fixType==='01'?'定宽':'定高'}}</td>
                     </tr>
                     <tr>
+                        <td>单位：</td>
+                        <td>{{data.unit}}</td>
+                    </tr>
+                    <tr>
                         <td>单价：</td>
                         <td>
                             <span v-if="customerType === '10'">
@@ -60,9 +64,18 @@
                             <span v-else>{{data.price}}</span>
                         </td>
                     </tr>
-                    <tr>
-                        <td>单位：</td>
-                        <td>{{data.unit}}</td>
+                    <tr v-if="customerType === '10'">
+                        <td>网上销售金额：</td>
+                        <td>
+                            <span>
+                                <currency-input
+                                    v-model="data.onlineSalesAmount"
+                                    :placeholder="'请输入单价'"
+                                    :customStyle="'width: 150px;'"
+                                    :customClass="customClass"
+                                ></currency-input>
+                            </span>
+                        </td>
                     </tr>
                     <tr>
                         <td>
@@ -287,15 +300,27 @@ export default {
                 });
                 return ;
             }
+            if(this.customerType === '10'){
+                if(!this.data.onlineSalesAmount){
+                    this.$alert('请填写网上销售金额','提示',{
+                        type: 'warning',
+                        confirmButtonText: '确定'
+                    });
+                    return;
+                }
+            }
             newNum = newNum.toString();
             let changeArr = [];
-            const updateObj = {
+            let updateObj = {
                 commodityID: this.data.id,
                 activityID: this.data.activityId,
                 quantity: this.data.quantity,
                 width: this.data.width,
                 height: this.data.height,
                 note: this.data.note
+            }
+            if(this.customerType === '10'){
+                updateObj.onlineSalesAmount = this.data.onlineSalesAmount
             }
             changeArr.push( updateShoppingCar(updateObj) )
             if(this.customerType === '10'){

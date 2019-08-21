@@ -1144,6 +1144,11 @@ export default {
         } else {
           this.array2[i].qtyRequired = getPush2[i].quantity;
         }
+        //网销
+        if(getPush2[i].onlineSalesAmount!== null){
+          this.array2[i].onlineSalesAmount = getPush2[i].onlineSalesAmount;
+        }
+
         //this.array2[i].qtyRequired = this.array2[i].qtyRequired.toFixed(2);
         //this.array2[i].finalPrice = (this.array[i].questPrice/this.array2[i].qtyRequired).toFixed(2);
         this.array2[i].finalPrice = this.array[i].questPrice;

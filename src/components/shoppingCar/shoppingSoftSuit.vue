@@ -196,6 +196,7 @@ export default {
         return {
             cid: Cookies.get('cid'),
             isManager: Cookies.get('isManager'),    //是否为管理员
+            customerType: Cookies.get('customerType'),
             //按钮样式
             commitBtn:{
                 background: 'gray'
@@ -641,6 +642,7 @@ export default {
         },
         //判断结算
         handleCommit(){
+            let arr = []
             for(var i = 0; i < this.multipleSelection.length; i++){
                 if(this.multipleSelection[i].activityEffective === false){
                     this.$alert(`产品中的${this.multipleSelection[i].item.itemNo}对应的活动已经过期，无法提交，请更换活动`, '提示', {
@@ -649,6 +651,17 @@ export default {
                     });
                     return ;
                 }
+                if(this.customerType === '10' && this.multipleSelection[i].onlineSalesAmount === null){
+                    arr.push(this.multipleSelection[i].item.itemNo)
+                }
+            }
+            if(arr.length !== 0){
+                let str = arr.join('、')
+                this.$alert(`产品中的${str}的网上销售金额为空，请填写后再提交结算`, '提示', {
+                    type: 'warning',
+                    confirmButtonText: '确定'
+                });
+                return ;
             }
             if(this.multipleSelection.length === 0){
                 this.$alert('选择不能为空！', '提示', {
