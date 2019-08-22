@@ -71,7 +71,7 @@
                 </el-table-column>
                 <el-table-column label="编码"
                     header-align="center"
-                    width="130">
+                    width="150">
                     <template slot-scope="scope">
                         <div>
                             <span v-if="tableStatus === 3">

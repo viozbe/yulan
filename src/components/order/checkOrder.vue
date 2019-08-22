@@ -381,7 +381,7 @@ import { submitOrder } from "@/api/orderList";
 import { CouponUseRecord } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
 import { curtainPay } from "@/api/orderList";
-import { orderSettlement } from "@/api/orderListASP";
+import { orderSettlement, InsertOperationRecord } from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
 /* import { mapMutations } from 'vuex' 
@@ -953,29 +953,30 @@ export default {
           this.data = [];
           if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
             var addIndex = 0;
-            for(var i =0; i< this.transferData.length;i++)
-            {
-              var addArr ={//跟字段对应上，直接判断
-                 cid:this.transferData[i].cid,
-                 postAddress:this.ctm_order.postAddress,
-                 wlContacts:this.ctm_order.wlContacts,
-                 wlTel:this.ctm_order.wlTel,
-                 addressId :this.transferData[i].addressId,
-                 province:this.ctm_order.reciverArea1,
-                 city:this.ctm_order.reciverArea2,
-                 country:this.ctm_order.reciverArea3,
-                 provinceID:this.transferData[i].provinceID,
-                 cityID:this.transferData[i].cityID,
-                 countryID:this.transferData[i].countryID,
-              }
-              if(JSON.stringify(addArr) == JSON.stringify(this.transferData[i]))
-              {
-                 addIndex = i;
-                 break;
+            for (var i = 0; i < this.transferData.length; i++) {
+              var addArr = {
+                //跟字段对应上，直接判断
+                cid: this.transferData[i].cid,
+                postAddress: this.ctm_order.postAddress,
+                wlContacts: this.ctm_order.wlContacts,
+                wlTel: this.ctm_order.wlTel,
+                addressId: this.transferData[i].addressId,
+                province: this.ctm_order.reciverArea1,
+                city: this.ctm_order.reciverArea2,
+                country: this.ctm_order.reciverArea3,
+                provinceID: this.transferData[i].provinceID,
+                cityID: this.transferData[i].cityID,
+                countryID: this.transferData[i].countryID
+              };
+              if (
+                JSON.stringify(addArr) == JSON.stringify(this.transferData[i])
+              ) {
+                addIndex = i;
+                break;
               }
             }
             this.radio = addIndex;
-            this.addressIt =true;
+            this.addressIt = true;
             this.showAddress();
           } else {
             this.data[0] = this.transferData[0];
@@ -1145,7 +1146,7 @@ export default {
           this.array2[i].qtyRequired = getPush2[i].quantity;
         }
         //网销
-        if(getPush2[i].onlineSalesAmount!== null){
+        if (getPush2[i].onlineSalesAmount !== null) {
           this.array2[i].onlineSalesAmount = getPush2[i].onlineSalesAmount;
         }
 
@@ -1306,11 +1307,24 @@ export default {
             /* this.totalPrice */ this.allSpend > this.Initial_balance &&
             this.arrearsFlag != "N"
           ) {
+            var recordData = {
+              ORDER_NO: res.data.order,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "创建未提交",
+              OPERATION_NOTE: "余额不足"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
             this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
               confirmButtonText: "确定",
               type: "warning"
             });
           } else {
+            var recordData = {
+              ORDER_NO: res.data.order,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "创建并提交"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
             this.$alert("提交成功", "提示", {
               confirmButtonText: "确定",
               type: "success"

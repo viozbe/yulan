@@ -118,8 +118,8 @@
         ></el-table-column>
       </el-table>
 
-      <div style="float:right;margin-top:20px;margin-right:10px;height:100px;">
-        <!-- <p>商品总价格：<span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span></p><br> -->
+      <div style="float:right;margin-top:20px;margin-right:10px;height:80px;">
+        <!-- <p>商品总价格：<span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span></p><span> -->
         <el-button
           v-if="check_CURTAIN_STATUS_ID==2"
           @click="_defeat()"
@@ -153,6 +153,52 @@
           plain
         >提交订单</el-button>
       </div>
+      <div style="padding:10px;">
+        <span class="timeLeft">
+          创建：
+          <span class="timeRight">{{ruleForm.DATE_CRE}}</span>
+        </span>
+        <span v-if="ruleForm.WEB_TJ_TIME" class="timeLeft">
+          提交：
+          <span class="timeRight">{{ruleForm.WEB_TJ_TIME}}</span>
+        </span>
+        <span class="timeLeft">
+          更新：
+          <span class="timeRight">{{ruleForm.DATE_UPDATE}}</span>
+        </span>
+        <br />
+        <span v-if="ruleForm.DATE_ACCEPT" class="timeLeft">
+          接收：
+          <span class="timeRight">{{ruleForm.DATE_ACCEPT}}</span>
+        </span>
+        <span v-if="ruleForm.DATE_DEAL" class="timeLeft">
+          处理：
+          <span class="timeRight">{{ruleForm.DATE_DEAL}}</span>
+        </span>
+        <span v-if="ruleForm.USER_NO" class="timeLeft">
+          处理人：
+          <span class="timeRight">{{ruleForm.USER_NO}}</span>
+        </span>
+      </div>
+      <div style="margin-top:30px;">
+        <el-divider></el-divider>
+        <span
+          style="margin-left:10px;color:red;"
+        >订单修改说明：当修改数量不超过200卷时，双方可通过电话在原订单上进行修改，当修改数量超过200卷时，乙方应向甲方提供书面修改说明。</span>
+        <br />
+        <span style="margin-left:10px;color:red;">法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span>
+        <el-divider></el-divider>
+      </div>
+      <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
+        <h1 style="margin-left:10px;">处理记录：</h1>
+        <el-steps direction="vertical" :active="operationRecords.length" style="margin-top:10px;margin-left:20px;">
+          <el-step v-for="item in operationRecords" :key="item.value" style="margin-top:1px;">
+            <template slot="title">
+              <div v-html="item.OPERATION_NOTE"></div>
+            </template>
+          </el-step>
+        </el-steps>
+      </div>
     </el-card>
   </el-card>
 </template>
@@ -167,7 +213,11 @@ import {
   queryCash,
   payAgain
 } from "@/api/orderList";
-import { updateCurtainOrder } from "@/api/orderListASP";
+import {
+  updateCurtainOrder,
+  InsertOperationRecord,
+  getOperationRecord
+} from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -193,6 +243,7 @@ export default {
       check_STATUS_ID: "",
       orderNum: "",
       detailVisible: false,
+      operationRecords: [],
       ruleForm: {
         ORDER_NO: "",
         LINKPERSON: "",
@@ -241,7 +292,9 @@ export default {
     },
     getDeleteArr(msg) {
       console.log(msg);
-      this.deleteIds = msg;
+      for (var i = 0; i < msg.length; i++) {
+        this.deleteIds.push(msg[i]);
+      }
     },
     //获取修改后的表格数据
     getFinalData(msg) {
@@ -300,6 +353,7 @@ export default {
     LjExamine() {
       let url = "/order/updateCurtainOrder.do";
       let data = {
+        cid: Cookies.get("cid"),
         orderNo: this.orderNum,
         curtainStatusId: 0,
         allCurtains: this.allCurtains,
@@ -342,6 +396,12 @@ export default {
         passExamine(url, data).then(res => {
           console.log(res);
           if (res.code == 0) {
+            var recordData = {
+              ORDER_NO: this.orderNum,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "确认兰居修改"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
             this.$alert("操作成功,该订单已经确认可再次提交", "提示", {
               confirmButtonText: "确定",
               type: "success"
@@ -376,6 +436,12 @@ export default {
         passExamine(url, data).then(res => {
           console.log(res);
           if (res.code == 0) {
+            var recordData = {
+              ORDER_NO: this.orderNum,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "退回兰居修改"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
             this.$alert("操作成功,该订单已退回兰居修改", "提示", {
               confirmButtonText: "确定",
               type: "success"
@@ -475,6 +541,14 @@ export default {
           this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
         }
         console.log(this.ruleForm.ORDERBODY);
+        var recordData = {
+          orderNo: this.orderNum
+        };
+        getOperationRecord(recordData).then(res => {
+          this.operationRecords = res.data;
+          console.log("456654");
+          console.log(this.operationRecords);
+        });
       });
     },
     //返回指定
@@ -504,7 +578,7 @@ export default {
       let url = "/order/putAgainOrder.do";
       let data = {
         cid: Cookies.get("cid"),
-        orderNo: Cookies.get("ORDER_NO")
+        orderNo: this.orderNum
       };
       console.log(data);
       if (
@@ -518,6 +592,12 @@ export default {
         });
       } else {
         payAgain(url, data).then(res => {
+          var recordData = {
+            ORDER_NO: this.orderNum,
+            OPERATION_PERSON: Cookies.get("cid"),
+            OPERATION_NAME: "重新提交"
+          };
+          InsertOperationRecord(recordData); //插入操作记录
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
             type: "success"
@@ -572,6 +652,18 @@ export default {
   line-height: 30px;
   display: inline-block;
   margin-right: 10px;
+}
+.timeLeft {
+  font-size: 14px;
+  line-height: 30px;
+  display: inline-block;
+}
+.timeRight {
+  font-size: 14px;
+  line-height: 30px;
+  display: inline-block;
+  margin-right: 20px;
+  font-weight: bold;
 }
 </style>
 <style>
