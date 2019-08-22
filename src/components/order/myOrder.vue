@@ -183,7 +183,7 @@
 
 <script>
 import { getOrderlist, passExamine } from "@/api/orderList";
-import { getAllOrders } from "@/api/orderListASP";
+import { getAllOrders, InsertOperationRecord } from "@/api/orderListASP";
 import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -609,6 +609,12 @@ export default {
       })
         .then(() => {
           cancelOrder(url, data).then(res => {
+            var recordData = {
+              ORDER_NO: pushOrderNum,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "作废订单"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
             this.refresh();
             this.$alert("删除成功", "提示", {
               confirmButtonText: "确定",
@@ -647,6 +653,12 @@ export default {
         });
       } else {
         payAgain(url, data).then(res => {
+          var recordData = {
+            ORDER_NO: item.ORDER_NO,
+            OPERATION_PERSON: Cookies.get("cid"),
+            OPERATION_NAME: "重新提交"
+          };
+          InsertOperationRecord(recordData); //插入操作记录
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
             type: "success"
