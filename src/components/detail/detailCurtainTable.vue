@@ -646,6 +646,7 @@ export default {
             else{
                 //同一过滤
                 let _data = JSON.parse(JSON.stringify(this.data))
+                var _data_temp =[];
                 _data.forEach(item => {
                     item.dosage = Number(item.dosage);
                     if(item.curtainItemName === null){
@@ -653,25 +654,39 @@ export default {
                     }
                     if(item.note === null)  item.note = "";
                     if(item.suggestion === null)    item.suggestion = "";
+                    _data_temp.push(JSON.parse(JSON.stringify(item)));
                 });
+                //把不需要比对的备注和意见拿出来
+                _data_temp.forEach(item => {
+                    item.note = "";
+                    item.suggestion = "";
+                });
+                var oldData_temp =[];
                 this.oldData.forEach(item => {
                     item.dosage = Number(item.dosage);
                     if(item.note === null)  item.note = "";
                     if(item.suggestion === null)    item.suggestion = "";
+                    oldData_temp.push(JSON.parse(JSON.stringify(item)));
                 })
-                if(JSON.stringify(this.oldData) !== JSON.stringify(_data)){
-                    this.$confirm('您已经修改过此套窗帘，依然确认通过吗？', '提示', {
+                //把不需要比对的备注和意见拿出来
+                oldData_temp.forEach(item => {
+                    item.note = "";
+                    item.suggestion = "";
+                })
+                //备注修改可以通过，同时保存备注
+                if(JSON.stringify(oldData_temp) !== JSON.stringify(_data_temp)){
+                    this.$confirm('您已经修改过此套窗帘，确认只会保存备注，依然确认通过吗？', '提示', {
                         confirmButtonText: '确定',
                         type: 'info'
                     }).then(() => {
                         this.$emit('visible',false);
-                        this.$emit('finalData',1);
+                        this.$emit('finalData',_data,1);
                         this.$emit('suggest',this.suggestionLJ);
                     }).catch(() =>{});
                 }
                 else{
                     this.$emit('visible',false);
-                    this.$emit('finalData',1);
+                    this.$emit('finalData',_data,1);
                     this.$emit('suggest',this.suggestionLJ);
                 }
             }

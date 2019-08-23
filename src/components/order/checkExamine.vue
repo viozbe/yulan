@@ -191,7 +191,11 @@
       </div>
       <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
         <h1 style="margin-left:10px;">处理记录：</h1>
-        <el-steps direction="vertical" :active="operationRecords.length" style="margin-top:10px;margin-left:20px;">
+        <el-steps
+          direction="vertical"
+          :active="operationRecords.length"
+          style="margin-top:10px;margin-left:20px;"
+        >
           <el-step v-for="item in operationRecords" :key="item.value" style="margin-top:1px;">
             <template slot="title">
               <div v-html="item.OPERATION_NOTE"></div>
@@ -355,7 +359,7 @@ export default {
       let data = {
         cid: Cookies.get("cid"),
         orderNo: this.orderNum,
-        curtainStatusId: 0,
+        curtainStatusId: "0",
         allCurtains: this.allCurtains,
         deleteIds: this.deleteIds
       };
@@ -367,10 +371,6 @@ export default {
             confirmButtonText: "确定",
             type: "success"
           });
-          // this.closeToTab({
-          //   oldUrl:'order/checkExamine',
-          //   newUrl:'order/myOrder'
-          // })
           this.check_CURTAIN_STATUS_ID = "0";
           this.getDetail();
         } else {
@@ -381,7 +381,7 @@ export default {
         }
       });
     },
-    //通过订单审核变为可提交状态
+    //确认兰居修改，通过订单审核变为可提交状态
     _pass() {
       var url = "/order/updateCurOrderStatus.do";
       var data = {
@@ -406,11 +406,6 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             }).then(() => {
-              //this.addTab('order/myOrder');
-              // this.closeToTab({
-              //   oldUrl:'order/checkExamine',
-              //   newUrl:'order/myOrder'
-              // })
               this.check_CURTAIN_STATUS_ID = "4";
             });
           } else {
@@ -422,6 +417,7 @@ export default {
         });
       });
     },
+    //退回兰居修改
     _defeat() {
       var url = "/order/updateCurOrderStatus.do";
       var data = {
@@ -446,7 +442,6 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             }).then(() => {
-              //this.addTab('order/myOrder');
               this.closeToTab({
                 oldUrl: "order/checkExamine",
                 newUrl: "order/myOrder"
@@ -546,8 +541,6 @@ export default {
         };
         getOperationRecord(recordData).then(res => {
           this.operationRecords = res.data;
-          console.log("456654");
-          console.log(this.operationRecords);
         });
       });
     },
