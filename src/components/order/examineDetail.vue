@@ -113,7 +113,11 @@
       </div>
       <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
         <h1 style="margin-left:10px;">处理记录：</h1>
-        <el-steps direction="vertical" :active="operationRecords.length" style="margin-top:10px;margin-left:20px;">
+        <el-steps
+          direction="vertical"
+          :active="operationRecords.length"
+          style="margin-top:10px;margin-left:20px;"
+        >
           <el-step v-for="item in operationRecords" :key="item.value" style="margin-top:1px;">
             <template slot="title">
               <div v-html="item.OPERATION_NOTE"></div>
@@ -189,9 +193,10 @@ export default {
       this.detailVisible = msg;
     },
     //获取修改后的表格数据
-    getFinalData(msg) {
+    getFinalData(msg, passFlag) {
       if (msg != null && msg != 1) {
-        this.saveChange(0);
+        if (passFlag != null && passFlag == 1) this.saveChange(1);
+        else this.saveChange(0);
       } else if (msg == 1) {
         this.saveChange(1);
         return;
@@ -328,7 +333,7 @@ export default {
       let data = {
         cid: Cookies.get("cid"),
         orderNo: this.orderNumber,
-        curtainStatusId: 2,
+        curtainStatusId: "2",
         allCurtains: this.allCurtains,
         ctmOrderDetails: this.ctmOrderDetails,
         deleteIds: this.deleteIds
@@ -373,23 +378,19 @@ export default {
         };
         getOperationRecord(recordData).then(res => {
           this.operationRecords = res.data;
-          console.log("456654");
-          console.log(this.operationRecords);
         });
       });
     },
-    //退回修改
+    //退回客户修改
     _back() {
       let url = "/order/updateCurtainOrder.do";
       let data = {
         cid: Cookies.get("cid"),
         orderNo: this.orderNumber,
-        curtainStatusId: 1,
+        curtainStatusId: "1",
         allCurtains: [],
         ctmOrderDetails: this.ctmOrderDetails
       };
-      console.log(this.allCurtains);
-      console.log(this.ruleForm.ORDERBODY);
       for (let j = 0; j < this.allCurtains.length; j++) {
         let array = new Array();
         for (let i = 0; i < this.allCurtains[j].length; i++) {
@@ -401,19 +402,6 @@ export default {
         }
         data.allCurtains.push(array);
       }
-      /* for(let j=0;j<this.ruleForm.ORDERBODY.length;j++){
-        let array = new Array();
-        for(let i=0;i<this.ruleForm.ORDERBODY[j].curtains.length;i++){
-          array[i] = new Object;
-          //array[i].suggestion=this.ruleForm.ORDERBODY[j].curtains[i].suggestion;
-          //array[i].suggestion=this.allCurtains[j][i].suggestion;
-          array[i].lineNo=this.ruleForm.ORDERBODY[j].curtains[i].lineNo;
-          array[i].orderItemNumber=this.ruleForm.ORDERBODY[j].curtains[i].orderItemNumber;
-          array[i].orderNo=this.orderNumber;
-        }
-        data.allCurtains.push(array);
-      } */
-      console.log(data.allCurtains);
       //defeatChange(url, data).then(res => {
       updateCurtainOrder(data).then(res => {
         console.log(res);
@@ -438,19 +426,29 @@ export default {
     _pass() {
       var url = "/order/updateCurOrderStatus.do";
       var data = {
+        cid: Cookies.get("cid"),
         orderNo: Cookies.get("ORDER_NO"),
-        curtainStatusId: "4"
+        curtainStatusId: "4",
+        allCurtains: [],
+        ctmOrderDetails: this.ctmOrderDetails
       };
-      passExamine(url, data).then(res => {
+      for (let j = 0; j < this.allCurtains.length; j++) {
+        let array = new Array();
+        for (let i = 0; i < this.allCurtains[j].length; i++) {
+          array[i] = new Object();
+          array[i].note = this.allCurtains[j][i].note;
+          array[i].suggestion = this.allCurtains[j][i].suggestion;
+          array[i].lineNo = this.allCurtains[j][i].lineNo;
+          array[i].orderItemNumber = this.allCurtains[j][i].orderItemNumber;
+          array[i].orderNo = this.orderNumber;
+        }
+        data.allCurtains.push(array);
+      }
+      //passExamine(url, data).then(res => {
+      updateCurtainOrder(data).then(res => {
         console.log(res);
         if (res.code == 0) {
-          var recordData = {
-            ORDER_NO: this.orderNum,
-            OPERATION_PERSON: Cookies.get("cid"),
-            OPERATION_NAME: "审核通过"
-          };
-          InsertOperationRecord(recordData); //插入操作记录
-          this.$alert("操作成功,已通过该订单的审核", "提示", {
+          this.$alert("操作成功,该订单已通过审核", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
@@ -480,6 +478,9 @@ export default {
       if (count == this.ruleForm.ORDERBODY.length) {
         this.passORnot = false;
         this.passORback = false;
+      } else {
+        this.passORnot = true;
+        this.passORback = true;
       }
     },
     //隔行变色
