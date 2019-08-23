@@ -53,9 +53,9 @@
                         {{getTypeName(scope.row.curtainPartName)}}
                         <!-- <br> -->
                         <span v-if="tableStatus !== 3">
-                            <el-checkbox @change="changeLink('lt',0)" v-if="scope.row.itemType === 'lt'" v-model="chooseBig[0]">
+                            <!-- <el-checkbox @change="changeLink('lt',0)" v-if="scope.row.itemType === 'lt'" v-model="chooseBig[0]">
                                 <span v-if="chooseBig[0] == false" style="color: red;">×</span>
-                            </el-checkbox>
+                            </el-checkbox> -->
                             <el-checkbox @change="changeLink('ls',1)" v-if="scope.row.itemType === 'ls'" v-model="chooseBig[1]">
                                 <span v-if="chooseBig[1] == false" style="color: red;">×</span>
                             </el-checkbox>
@@ -603,7 +603,12 @@ export default {
                 default:
                     _index = -1;
             }
-            if(_index >= 0 && _index <= 4){
+            /**
+             * 8.22新需求
+             * 帘头改为配件包的勾选方式
+             * 即取消双向绑定，帘头固定
+             */
+            if(_index >= 1 && _index <= 4){
                 _arr.forEach(item => {
                     if(item.deleteFlag !== 'Y' || item.choose === true){
                         flag = false;
@@ -1205,7 +1210,7 @@ export default {
                 let _manufacturingInstructions = _curtainData[i].manufacturingInstructions;
                 if(_itemType === 'ls' || _itemType === 'sha' || _itemType === 'lspb'){
                     if(_curtainData[i].productType === 'ML'){
-                        if(_manufacturingInstructions === ''){
+                        if(_manufacturingInstructions === '' && _curtainData[i].choose){
                             this.$alert('制造说明不能为空', '提示', {
                                 confirmButtonText: '好的',
                                 type: 'warning'
@@ -1214,7 +1219,7 @@ export default {
                         }
                     }
                 }
-                if(_itemType === 'lt' && _curtainData[i].productType !== 'XHB' && _manufacturingInstructions === ''){
+                if(_itemType === 'lt' && _curtainData[i].productType !== 'XHB' && _manufacturingInstructions === '' && _curtainData[i].choose){
                     this.$alert('制造说明不能为空', '提示', {
                         confirmButtonText: '好的',
                         type: 'warning'
