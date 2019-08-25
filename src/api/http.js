@@ -24,22 +24,22 @@ Axios.interceptors.request.use(function (config) {
  * @param params 
  * @returns {Promise} 
  */
-export function get(url,params={}){
-    return new Promise((resolve,reject) => {
-        Axios.get(url,{
-            params:params,
-        })
-        .then(response => {
-            if(response.data.code === CODE_OK){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch(err => {
-            reject(err)
-        })
+export function get(url, params = {}, config = {}) {
+    return new Promise((resolve, reject) => {
+        Axios.get(url, {
+            params: params,
+        }, config)
+            .then(response => {
+                if (response.data.code === CODE_OK) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(err => {
+                reject(err)
+            })
     })
 }
 /**
@@ -48,20 +48,20 @@ export function get(url,params={}){
  * @param data
  * @returns {Promise}
  */
-export function post(url,data = {}){
-    return new Promise((resolve,reject) => {
-        Axios.post(url,data)
-        .then(response => {
-            if(response.data.code === CODE_OK){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch( error => {
-            reject(error);
-        })
+export function post(url, data = {}, config = {}) {
+    return new Promise((resolve, reject) => {
+        Axios.post(url, data, config)
+            .then(response => {
+                if (response.data.code === CODE_OK) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(error => {
+                reject(error);
+            })
         // ,err => {
         //         reject(err)
         //     })
@@ -73,23 +73,23 @@ export function post(url,data = {}){
  * @param data
  * @returns {Promise}
  */
-export function patch(url,data = {}){
-    return new Promise((resolve,reject) => {
-        Axios.patch(url,data)
-        .then(response => {
-            if(response.data.code === CODE_OK){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch(error => {
-            reject(error);
-        })
-            // ,err => {
-            //     reject(err)
-            // })
+export function patch(url, data = {}, config = {}) {
+    return new Promise((resolve, reject) => {
+        Axios.patch(url, data, config)
+            .then(response => {
+                if (response.data.code === CODE_OK) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(error => {
+                reject(error);
+            })
+        // ,err => {
+        //     reject(err)
+        // })
     })
 }
 /**
@@ -98,17 +98,17 @@ export function patch(url,data = {}){
  * @param data
  * @returns {Promise}
  */
-export function put(url,data = {}){
-    return new Promise((resolve,reject) => {
-        Axios.put(url,data)
+export function put(url, data = {}, config = {}) {
+    return new Promise((resolve, reject) => {
+        Axios.put(url, data, config)
             .then(response => {
-                if(response.data.code === CODE_OK){
+                if (response.data.code === CODE_OK) {
                     resolve(response.data);
                 }
-                else{
+                else {
                     reject(response.data);
                 }
-            },err => {
+            }, err => {
                 reject(err)
             })
     })

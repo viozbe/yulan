@@ -58,6 +58,8 @@
       </div>
       <el-table
         border
+        :show-summary="ruleForm.ORDERBODY.length > 1"
+        :summary-method="getSummaries"
         :data="ruleForm.ORDERBODY"
         style="width: 100%"
         :row-class-name="tableRowClassName"
@@ -78,13 +80,13 @@
           label="发货说明"
           width="90"
         ></el-table-column>
-        <el-table-column align="center" label="折后金额" width="100">
+        <el-table-column prop="PROMOTION_COST" align="center" label="折后金额" width="100">
           <template slot-scope="scope1">
             <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
             <span v-else>{{scope1.row.PROMOTION_COST}}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="年返利使用金额" width="100">
+        <el-table-column prop="BACK_Y" align="center" label="年返利使用金额" width="100">
           <template slot-scope="scope1">
             <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
             <span v-else>{{scope1.row.BACK_Y}}</span>
@@ -96,7 +98,7 @@
             <span v-else>{{scope1.row.BACK_M}}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="应付金额" width="100">
+        <el-table-column prop="FINAL_COST" align="center" label="应付金额" width="100">
           <template slot-scope="scope1">
             <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID !=-1">***</span>
             <span v-else>{{scope1.row.FINAL_COST}}</span>
@@ -275,7 +277,6 @@ export default {
     }
   },
   created: function() {
-    this.queryMoney();
     this.orderNum = Cookies.get("ORDER_NO");
     this.isX = this.orderNum.slice(0, 1) == "X";
     console.log(Cookies.get("CURTAIN_STATUS_ID"));
@@ -554,52 +555,74 @@ export default {
         this.addTab("order/myOrder");
       }
     },
-    //余额判断
-    queryMoney() {
+    refreshPay() {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId")
       };
+      //每次重新提交的时候判断一下余额
       queryCash(url, data).then(res => {
-        console.log(res);
         this.Initial_balance = res.data;
-        console.log(this.Initial_balance);
+        var url2 = "/order/putAgainOrder.do";
+        var data2 = {
+          cid: Cookies.get("cid"),
+          orderNo: this.orderNum
+        };
+        if (
+          this.ruleForm.ALL_SPEND > this.Initial_balance &&
+          this.check_STATUS_ID == 5
+        ) {
+          //欠款可提交的话可以跳过判断
+          this.$alert("余额不足，还需充值" + (this.Initial_balance - this.ruleForm.ALL_SPEND) + '元才能提交', "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+        } else {
+          payAgain(url2, data2).then(res => {
+            var recordData = {
+              ORDER_NO: this.orderNum,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "重新提交"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
+            this.$alert("提交成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success"
+            });
+            console.log(res);
+            this.addTab("order/myOrder");
+            this.closeTab("order/orderDetail");
+          });
+        }
       });
     },
-    refreshPay() {
-      let url = "/order/putAgainOrder.do";
-      let data = {
-        cid: Cookies.get("cid"),
-        orderNo: this.orderNum
-      };
-      console.log(data);
-      if (
-        this.ruleForm.ALL_SPEND > this.Initial_balance &&
-        this.check_STATUS_ID == 5
-      ) {
-        //欠款可提交的话可以跳过判断
-        this.$alert("余额不足，请尽快充值", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-      } else {
-        payAgain(url, data).then(res => {
-          var recordData = {
-            ORDER_NO: this.orderNum,
-            OPERATION_PERSON: Cookies.get("cid"),
-            OPERATION_NAME: "重新提交"
-          };
-          InsertOperationRecord(recordData); //插入操作记录
-          this.$alert("提交成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          console.log(res);
-          this.addTab("order/myOrder");
-          this.closeTab("order/orderDetail");
-        });
-      }
+    //合计行显示
+    getSummaries({ columns, data }) {
+      var sums = [];
+      columns.forEach((column, index) => {
+        if (index == 0) {
+          sums[index] = "总计";
+          return;
+        } else if (index == 5 || index == 6 || index == 7 || index == 8) {
+          var values = data.map(item => Number(item[column.property]));
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+          } else {
+            sums[index] = "";
+          }
+        } else {
+          sums[index] = "";
+        }
+      });
+      return sums;
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {

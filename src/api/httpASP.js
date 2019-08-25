@@ -10,25 +10,25 @@ var baseUrl = 'http://47.107.56.156:568/';
  * @param params 
  * @returns {Promise} 
  */
-export function get(url,params={}){
+export function get(url, params = {}, config = {}) {
     Axios.defaults.withCredentials = false;
-    return new Promise((resolve,reject) => {
-        Axios.get(baseUrl + url,{
-            params:params,
-        })
-        .then(response => {
-            Axios.defaults.withCredentials = true;
-            if(response.data.code === CODE_OK || response.data.success){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch(err => {
-            Axios.defaults.withCredentials = true;
-            reject(err)
-        })
+    return new Promise((resolve, reject) => {
+        Axios.get(baseUrl + url, {
+            params: params,
+        }, config)
+            .then(response => {
+                Axios.defaults.withCredentials = true;
+                if (response.data.code === CODE_OK || response.data.success) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(err => {
+                Axios.defaults.withCredentials = true;
+                reject(err)
+            })
     })
 }
 /**
@@ -37,23 +37,23 @@ export function get(url,params={}){
  * @param data
  * @returns {Promise}
  */
-export function post(url,data = {}){
+export function post(url, data = {}, config = {}) {
     Axios.defaults.withCredentials = false;
-    return new Promise((resolve,reject) => {
-        Axios.post(baseUrl + url,data)
-        .then(response => {
-            Axios.defaults.withCredentials = true;
-            if(response.data.code === CODE_OK || response.data.success){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch( error => {
-            Axios.defaults.withCredentials = true;
-            reject(error);
-        })
+    return new Promise((resolve, reject) => {
+        Axios.post(baseUrl + url, data, config)
+            .then(response => {
+                Axios.defaults.withCredentials = true;
+                if (response.data.code === CODE_OK || response.data.success) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(error => {
+                Axios.defaults.withCredentials = true;
+                reject(error);
+            })
     })
 }
 /**
@@ -62,23 +62,23 @@ export function post(url,data = {}){
  * @param data
  * @returns {Promise}
  */
-export function patch(url,data = {}){
+export function patch(url, data = {}, config = {}) {
     Axios.defaults.withCredentials = false;
-    return new Promise((resolve,reject) => {
-        Axios.patch(baseUrl + url,data)
-        .then(response => {
-            Axios.defaults.withCredentials = true;
-            if(response.data.code === CODE_OK || response.data.success){
-                resolve(response.data);
-            }
-            else{
-                reject(response.data);
-            }
-        })
-        .catch(error => {
-            Axios.defaults.withCredentials = true;
-            reject(error);
-        })
+    return new Promise((resolve, reject) => {
+        Axios.patch(baseUrl + url, data, config)
+            .then(response => {
+                Axios.defaults.withCredentials = true;
+                if (response.data.code === CODE_OK || response.data.success) {
+                    resolve(response.data);
+                }
+                else {
+                    reject(response.data);
+                }
+            })
+            .catch(error => {
+                Axios.defaults.withCredentials = true;
+                reject(error);
+            })
     })
 }
 /**
@@ -87,19 +87,19 @@ export function patch(url,data = {}){
  * @param data
  * @returns {Promise}
  */
-export function put(url,data = {}){
+export function put(url, data = {}, config = {}) {
     Axios.defaults.withCredentials = false;
-    return new Promise((resolve,reject) => {
-        Axios.put(baseUrl + url,data)
+    return new Promise((resolve, reject) => {
+        Axios.put(baseUrl + url, data, config)
             .then(response => {
                 Axios.defaults.withCredentials = true;
-                if(response.data.code === CODE_OK || response.data.success){
+                if (response.data.code === CODE_OK || response.data.success) {
                     resolve(response.data);
                 }
-                else{
+                else {
                     reject(response.data);
                 }
-            },err => {
+            }, err => {
                 Axios.defaults.withCredentials = true;
                 reject(err)
             })
