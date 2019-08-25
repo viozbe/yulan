@@ -643,10 +643,16 @@ export default {
         };
         if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
           //欠款可提交的话可以跳过判断
-          this.$alert("余额不足，当前订单还需充值" + (item.ALL_SPEND - this.Initial_balance) + '元才能提交', "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
+          this.$alert(
+            "余额不足，当前订单还需充值" +
+              (item.ALL_SPEND - this.Initial_balance) +
+              "元才能提交",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning"
+            }
+          );
         } else {
           payAgain(url2, data2).then(res => {
             var recordData = {

@@ -574,10 +574,16 @@ export default {
           this.check_STATUS_ID == 5
         ) {
           //欠款可提交的话可以跳过判断
-          this.$alert("余额不足，当前订单还需充值" + (this.ruleForm.ALL_SPEND - this.Initial_balance) + '元才能提交', "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
+          this.$alert(
+            "余额不足，当前订单还需充值" +
+              (this.ruleForm.ALL_SPEND - this.Initial_balance) +
+              "元才能提交",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning"
+            }
+          );
         } else {
           payAgain(url2, data2).then(res => {
             var recordData = {
@@ -615,6 +621,9 @@ export default {
                 return prev;
               }
             }, 0);
+            sums[index] = sums[index].toFixed(2);
+            if (this.isManager == "0" && this.check_CURTAIN_STATUS_ID != -1)
+              sums[index] = "***";
           } else {
             sums[index] = "";
           }
