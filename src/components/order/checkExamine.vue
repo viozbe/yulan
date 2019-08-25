@@ -574,7 +574,7 @@ export default {
           this.check_STATUS_ID == 5
         ) {
           //欠款可提交的话可以跳过判断
-          this.$alert("余额不足，还需充值" + (this.Initial_balance - this.ruleForm.ALL_SPEND) + '元才能提交', "提示", {
+          this.$alert("余额不足，当前订单还需充值" + (this.ruleForm.ALL_SPEND - this.Initial_balance) + '元才能提交', "提示", {
             confirmButtonText: "确定",
             type: "warning"
           });
