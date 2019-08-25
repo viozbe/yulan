@@ -627,45 +627,48 @@ export default {
           console.log("还没删");
         });
     },
-    //余额判断
-    queryMoney() {
+    refreshPay(item) {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId")
       };
+      //每次重新提交的时候判断一下余额
       queryCash(url, data).then(res => {
         this.Initial_balance = res.data;
-      });
-    },
-    refreshPay(item) {
-      let url = "/order/putAgainOrder.do";
-      let data = {
-        cid: Cookies.get("cid"),
-        orderNo: item.ORDER_NO
-      };
-      console.log(data);
-      if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
-        //欠款可提交的话可以跳过判断
-        this.$alert("余额不足，请尽快充值", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-      } else {
-        payAgain(url, data).then(res => {
-          var recordData = {
-            ORDER_NO: item.ORDER_NO,
-            OPERATION_PERSON: Cookies.get("cid"),
-            OPERATION_NAME: "重新提交"
-          };
-          InsertOperationRecord(recordData); //插入操作记录
-          this.$alert("提交成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
+        var url2 = "/order/putAgainOrder.do";
+        var data2 = {
+          cid: Cookies.get("cid"),
+          orderNo: item.ORDER_NO
+        };
+        if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
+          //欠款可提交的话可以跳过判断
+          this.$alert(
+            "余额不足，当前订单还需充值" +
+              (item.ALL_SPEND - this.Initial_balance) +
+              "元才能提交",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning"
+            }
+          );
+        } else {
+          payAgain(url2, data2).then(res => {
+            var recordData = {
+              ORDER_NO: item.ORDER_NO,
+              OPERATION_PERSON: Cookies.get("cid"),
+              OPERATION_NAME: "重新提交"
+            };
+            InsertOperationRecord(recordData); //插入操作记录
+            this.$alert("提交成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success"
+            });
+            this.refresh();
           });
-          this.refresh();
-        });
-      }
+        }
+      });
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
@@ -682,7 +685,6 @@ export default {
   },
   //生命周期
   created() {
-    this.queryMoney();
     this.refresh();
   }
 };

@@ -5,7 +5,7 @@ import App from './App'
 import router from './router'
 import 'babel-polyfill'
 import Axios from 'axios'
-import { get, post, patch, put} from './api/http'
+import { get, post, patch, put } from './api/http'
 import qs from 'qs'
 import Cookies from 'js-cookie'
 import ElementUI from 'element-ui'
@@ -20,20 +20,23 @@ Vue.use(ElementUI);
 Vue.use(Cookies);
 Axios.defaults.withCredentials = true;
 
-Vue.prototype.$axios=Axios;
-Vue.prototype.$get=get;
-Vue.prototype.$post=post;
-Vue.prototype.$patch=patch;
-Vue.prototype.$put=put;
+Vue.prototype.$axios = Axios;
+Vue.prototype.$get = get;
+Vue.prototype.$post = post;
+Vue.prototype.$patch = patch;
+Vue.prototype.$put = put;
 
 //请求拦截
 Axios.interceptors.request.use(config => {
   //解决IE请求缓存
-  if(config.method === 'get'){
+  if (config.method === 'get') {
     config.params.tForIE = new Date()
   }
   //一个取巧的方法，之后看能怎么优化
-  if(config.url !== '/item/getGYList.do' && config.url !== '/salPromotion/selectSalPromotion.do')
+  //在axios中传入config，配置一个参数来控制。如果loading为false，则不需要loading（见main.vue getUserMoney方法）
+  if (config.loading != undefined && config.loading == false)
+    return config;
+  if (config.url !== '/item/getGYList.do' && config.url !== '/salPromotion/selectSalPromotion.do')
     showFullScreenLoading();
   return config;
 }, err => {
@@ -68,14 +71,14 @@ var vm = new Vue({
 
 Vue.directive('enterNumber', {
   inserted: function (el) {
-    el.addEventListener("keypress",function(e){
+    el.addEventListener("keypress", function (e) {
       e = e || window.event;
       let charcode = typeof e.charCode === 'number' ? e.charCode : e.keyCode;
       let re = /\d/;
-      if(!re.test(String.fromCharCode(charcode)) && charcode > 9 && !e.ctrlKey){
-        if(e.preventDefault){
+      if (!re.test(String.fromCharCode(charcode)) && charcode > 9 && !e.ctrlKey) {
+        if (e.preventDefault) {
           e.preventDefault();
-        }else{
+        } else {
           e.returnValue = false;
         }
       }
@@ -96,22 +99,22 @@ Vue.component('currency-input', {
       >\
     </span>\
   ',
-  data:function(){
-    return{
-      defaultStyle:{
+  data: function () {
+    return {
+      defaultStyle: {
         width: '85px'
       }
     }
   },
-  computed:{
-    styleObject:function(){
+  computed: {
+    styleObject: function () {
       return this.customStyle || this.defaultStyle
     },
-    classObject:function(){
+    classObject: function () {
       return this.customClass || 'el-input--mini'
     }
   },
-  props: ['value','placeholder','customClass','customStyle'],
+  props: ['value', 'placeholder', 'customClass', 'customStyle'],
   methods: {
     // 不是直接更新值，而是使用此方法来对输入值进行格式化和位数限制
     updateValue: function (value) {
@@ -128,11 +131,11 @@ Vue.component('currency-input', {
         .replace('.', '$#$').replace(/\./g, '').replace('$#$', '.')
         //保留两位小数
         .slice(
-            0,
-            value.indexOf('.') === -1
-              ? value.length
-              : value.indexOf('.') + 3
-          )
+          0,
+          value.indexOf('.') === -1
+            ? value.length
+            : value.indexOf('.') + 3
+        )
       // formattedValue = formattedValue.replace(/^\./g, '');
       // //保证只有出现一个小数点而没有多个. 
       // formattedValue.value = formattedValue.replace(/\.{2,}/g, '.');
