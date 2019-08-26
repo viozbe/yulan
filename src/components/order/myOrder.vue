@@ -665,6 +665,7 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             });
+            this.$root.$emit('refreshMoneyEvent');//触发主页面刷新余额
             this.refresh();
           });
         }

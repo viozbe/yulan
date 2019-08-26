@@ -22,7 +22,6 @@
                     <el-table-column
                         type="selection"
                         width="55"
-                        fixed="left"
                         :selectable="checkActiviyEffect">
                     </el-table-column>
                     <el-table-column
@@ -117,7 +116,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <br>
             </template>
         </el-table-column>
         <el-table-column>

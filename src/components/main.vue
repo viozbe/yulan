@@ -13,6 +13,7 @@
             @select="addTab"
             :collapse="asideStatus"
           >
+           <!-- <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item"></menuTree> -->
             <el-submenu index="shops">
               <template slot="title">
                 <i class="iconfont icon-color">&#xe624;</i>
@@ -243,6 +244,7 @@
                 <strong>
                   <i>{{moneySituation}}</i>
                 </strong>
+                <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;" @click="refreshUserMoney"></i>
               </span>
             </div>
             <el-tab-pane
@@ -272,6 +274,7 @@ import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Vue from "vue";
 import Cookies from "js-cookie";
+import menuTree from "./menuTree"
 
 export default {
   name: "Main",
@@ -302,7 +305,8 @@ export default {
       adminText: "无新公告发布!",
       moneySituation: "",
       Initial_balance: 0,
-      getTheTab: ""
+      getTheTab: "",
+      refreshMoneyClass:'el-icon-refresh-left'
       // dialogFormVisible: false,       //伪登录
       // formLabelWidth: '120px'
     };
@@ -373,53 +377,34 @@ export default {
       });
     },
     //获取用户余额情况
-    userMoney() {
-      var me = this;
+    async userMoney() {
+      this.refreshMoneyClass = 'el-icon-loading';
+      this.moneySituation ='';
       getUserMoney(
         {
-          cid: me.cid,
+          cid: this.cid,
           companyId: Cookies.get("companyId")
         },
         { loading: false } //传入参数控制页面是否loading
       )
         .then(res => {
-          if (me.isManager != "1") {
+          if (this.isManager != "1") {
             if (res.data < 0) {
-              me.moneySituation = "当前余额不足，请尽快打款";
+              this.moneySituation = "当前余额不足，请尽快打款";
             } else {
-              me.moneySituation = "当前余额充足，请继续保持";
+              this.moneySituation = "当前余额充足，请继续保持";
             }
           } else {
-            me.moneySituation = "当前余额 " + res.data + "元";
+            this.moneySituation = "当前余额 " + res.data + "元";
           }
+          this.refreshMoneyClass = 'el-icon-refresh-left';
         })
         .catch(err => {
-          console.log(err);
+          //console.log(err);
         });
-      //每5秒查询1次用户余额，保证余额实时更新
-      this.moneyTimer = setInterval(() => {
-        getUserMoney(
-          {
-            cid: me.cid,
-            companyId: Cookies.get("companyId")
-          },
-          { loading: false } //传入参数控制页面是否loading
-        )
-          .then(res => {
-            if (me.isManager != "1") {
-              if (res.data < 0) {
-                me.moneySituation = "当前余额不足，请尽快打款";
-              } else {
-                me.moneySituation = "当前余额充足，请继续保持";
-              }
-            } else {
-              me.moneySituation = "当前余额 " + res.data + "元";
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }, 5000);
+    },
+    refreshUserMoney(){
+      this.userMoney();
     },
     //按钮样式--菜单展开收起
     changeAside() {
@@ -486,7 +471,7 @@ export default {
     }
   },
   computed: {
-    ...mapState("navTabs", ["tabList"]),
+    ...mapState("navTabs", ["tabList","menuTreeList"]),
     getRefund() {
       return this.$store.getters["badge/getRefund"];
     },
@@ -581,10 +566,17 @@ export default {
         }
       }
     };
+    //可以从其他页面触发刷新余额
+    this.$root.$on('refreshMoneyEvent',()=>{
+      this.userMoney();
+    })
     // console.log(this.defaultUrl);
   },
   beforeDestroy() {
     clearInterval(this.moneyTimer);
+  },
+  components: {
+    menuTree
   },
   watch: {}
 };

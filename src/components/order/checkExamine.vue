@@ -4,7 +4,7 @@
       title="窗帘详情"
       :show-close="true"
       :visible.sync="detailVisible"
-      width="1300px"
+      width="92%"
       top="5vh"
     >
       <keep-alive>
@@ -596,7 +596,7 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             });
-            console.log(res);
+            this.$root.$emit('refreshMoneyEvent');//触发主页面刷新余额
             this.addTab("order/myOrder");
             this.closeTab("order/orderDetail");
           });

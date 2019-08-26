@@ -5,7 +5,7 @@
       :show-close="false"
       :visible.sync="detailVisible"
       :close-on-click-modal="false"
-      width="1400px"
+      width="92%"
       top="5vh"
     >
       <keep-alive>

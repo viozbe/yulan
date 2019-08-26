@@ -1,6 +1,5 @@
 import Axios from 'axios'
 
-const CODE_OK = 0;
 //var baseUrl = 'http://localhost:49438/';
 var baseUrl = 'http://47.107.56.156:568/';
 
@@ -18,12 +17,7 @@ export function get(url, params = {}, config = {}) {
         }, config)
             .then(response => {
                 Axios.defaults.withCredentials = true;
-                if (response.data.code === CODE_OK || response.data.success) {
-                    resolve(response.data);
-                }
-                else {
-                    reject(response.data);
-                }
+                resolve(response.data);
             })
             .catch(err => {
                 Axios.defaults.withCredentials = true;
@@ -43,12 +37,7 @@ export function post(url, data = {}, config = {}) {
         Axios.post(baseUrl + url, data, config)
             .then(response => {
                 Axios.defaults.withCredentials = true;
-                if (response.data.code === CODE_OK || response.data.success) {
-                    resolve(response.data);
-                }
-                else {
-                    reject(response.data);
-                }
+                resolve(response.data);
             })
             .catch(error => {
                 Axios.defaults.withCredentials = true;
@@ -68,12 +57,7 @@ export function patch(url, data = {}, config = {}) {
         Axios.patch(baseUrl + url, data, config)
             .then(response => {
                 Axios.defaults.withCredentials = true;
-                if (response.data.code === CODE_OK || response.data.success) {
-                    resolve(response.data);
-                }
-                else {
-                    reject(response.data);
-                }
+                resolve(response.data);
             })
             .catch(error => {
                 Axios.defaults.withCredentials = true;
@@ -93,12 +77,7 @@ export function put(url, data = {}, config = {}) {
         Axios.put(baseUrl + url, data, config)
             .then(response => {
                 Axios.defaults.withCredentials = true;
-                if (response.data.code === CODE_OK || response.data.success) {
-                    resolve(response.data);
-                }
-                else {
-                    reject(response.data);
-                }
+                resolve(response.data);
             }, err => {
                 Axios.defaults.withCredentials = true;
                 reject(err)

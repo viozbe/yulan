@@ -1253,6 +1253,7 @@ export default {
               type: "warning"
             });
           } else {
+            this.$root.$emit('refreshMoneyEvent');//触发主页面刷新余额
             this.$alert("提交成功", "提示", {
               confirmButtonText: "确定",
               type: "success"

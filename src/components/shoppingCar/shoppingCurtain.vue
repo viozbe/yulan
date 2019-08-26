@@ -22,7 +22,6 @@
             <el-table-column
               type="selection"
               width="55"
-              fixed="left"
               :selectable="checkActiviyEffect"
             ></el-table-column>
             <el-table-column label="型号">
@@ -86,7 +85,6 @@
               </template>
             </el-table-column>
           </el-table>
-          <br />
         </template>
       </el-table-column>
       <el-table-column>
@@ -672,6 +670,9 @@ export default {
 };
 </script>
 <style>
+#shoppingCurtain{
+    margin-top: -32px;
+}
 #shoppingCurtain .el-table .colorType_0 {
   background: oldlace;
 }
@@ -694,6 +695,14 @@ export default {
   -webkit-transition: background-color 0.25s ease;
   transition: background-color 0.25s ease;
 }
+</style>
+<style scoped>
+a {
+  text-decoration: none;
+}
+a:hover {
+  cursor: pointer;
+}
 #accountBox {
   width: 100%;
   height: 50px;
@@ -713,14 +722,6 @@ export default {
 #accountBox :nth-child(2) > div {
   margin-left: 20px;
   display: inline-block;
-}
-</style>
-<style scoped>
-a {
-  text-decoration: none;
-}
-a:hover {
-  cursor: pointer;
 }
 .link-detail {
   margin: 0 5px;
