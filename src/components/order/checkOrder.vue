@@ -1189,10 +1189,7 @@ export default {
         .then(res => {
           console.log(res);
           console.log("成功!!!");
-          if (
-            /* this.totalPrice */ this.allSpend > this.Initial_balance &&
-            this.arrearsFlag != "N"
-          ) {
+          if (this.allSpend > this.Initial_balance && this.arrearsFlag != "N") {
             this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
               confirmButtonText: "确定",
               type: "success"
@@ -1212,148 +1209,165 @@ export default {
         });
     },
     payNew() {
-      var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-      //this.ctm_order.orderNo = this.array2[0].orderNo;
-      var deleteArray = [];
-      for (var i = 0; i < getPush3.length; i++) {
-        deleteArray[i] = getPush3[i].cartItemId;
-      }
-      var data = {
-        product_group_tpye: "E", //产品类别
-        promotion_cost: this.totalPrice, //活动价格【】
-        cid: Cookies.get("cid"), //登录用户账号
-        companyId: Cookies.get("companyId"),
-        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-        rebateM: this.rebateM, //月优惠券编号
-        arrearsFlag: this.arrearsFlag,
-        ctm_order: this.ctm_order,
-        ctm_orders: this.array2,
-        cartItemIDs: deleteArray
-      };
-      if (
-        this.ctm_order.deliveryNotes == "" &&
-        this.ctm_order.deliveryType == 3
-      ) {
-        this.$alert("请填写指定的物流公司", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-        return;
-      }
-      orderSettlement(data)
-        .then(res => {
-          console.log(res);
-          console.log("成功!!!");
-          if (
-            /* this.totalPrice */ this.allSpend > this.Initial_balance &&
-            this.arrearsFlag != "N"
-          ) {
-            this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
-              confirmButtonText: "确定",
-              type: "warning"
-            });
-          } else {
-            this.$root.$emit('refreshMoneyEvent');//触发主页面刷新余额
-            this.$alert("提交成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            });
-          }
-        })
-        .then(() => {
-          deleteCurtain(deleteArray); //删除订单信息
-          this.closeToTab({
-            oldUrl: "order/checkOrder",
-            newUrl: "order/myOrder"
-          });
-        });
-    },
-    //提交结算
-    payIt() {
-      var url = "/order/orderCount.do";
-      var data = {
-        product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
-        promotion_cost: this.totalPrice, //活动价格【】
-        cid: Cookies.get("cid"), //登录用户账号
-        companyId: Cookies.get("companyId"),
-        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-        rebateM: this.rebateM, //月优惠券编号
-        arrearsFlag: this.arrearsFlag,
-        ctm_order: this.ctm_order,
-        ctm_orders: this.array2
-      };
-      //删除购物车数据
-      var deleteArray = [];
-      var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-      for (var i = 0; i < getPush3.length; i++) {
-        deleteArray[i] = getPush3[i].id;
-      }
-      console.log(deleteArray);
-      //console.log(this.ctm_order.deliveryNotes);
-      if (
-        this.ctm_order.deliveryNotes == "" &&
-        this.ctm_order.deliveryType == 3
-      ) {
-        this.$alert("请填写指定的物流公司", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-        return;
-      }
-      submitOrder(url, data)
-        .then(res => {
-          console.log(res);
-          console.log("成功!!!");
-          if (
-            /* this.totalPrice */ this.allSpend > this.Initial_balance &&
-            this.arrearsFlag != "N"
-          ) {
-            var recordData = {
-              ORDER_NO: res.data.order,
-              OPERATION_PERSON: Cookies.get("cid"),
-              OPERATION_NAME: "创建未提交",
-              OPERATION_NOTE: "余额不足"
-            };
-            InsertOperationRecord(recordData); //插入操作记录
-            this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
-              confirmButtonText: "确定",
-              type: "warning"
-            });
-          } else {
-            var recordData = {
-              ORDER_NO: res.data.order,
-              OPERATION_PERSON: Cookies.get("cid"),
-              OPERATION_NAME: "创建并提交"
-            };
-            InsertOperationRecord(recordData); //插入操作记录
-            this.$alert("提交成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            });
-          }
-        })
-        .then(() => {
-          DeleteShopRecord(deleteArray); //删除订单信息
-          this.closeToTab({
-            oldUrl: "order/checkOrder",
-            newUrl: "order/myOrder"
-          });
-        });
-    },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
-    //查询余额
-    queryMoney() {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId")
       };
+      //每次提交的时候判断一下余额
       queryCash(url, data).then(res => {
-        console.log(res);
         this.Initial_balance = res.data;
+        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+        var deleteArray = [];
+        for (var i = 0; i < getPush3.length; i++) {
+          deleteArray[i] = getPush3[i].cartItemId;
+        }
+        var data2 = {
+          product_group_tpye: "E", //产品类别
+          promotion_cost: this.totalPrice, //活动价格【】
+          cid: Cookies.get("cid"), //登录用户账号
+          companyId: Cookies.get("companyId"),
+          rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+          rebateM: this.rebateM, //月优惠券编号
+          arrearsFlag: this.arrearsFlag,
+          ctm_order: this.ctm_order,
+          ctm_orders: this.array2,
+          cartItemIDs: deleteArray
+        };
+        if (
+          this.ctm_order.deliveryNotes == "" &&
+          this.ctm_order.deliveryType == 3
+        ) {
+          this.$alert("请填写指定的物流公司", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return;
+        }
+        orderSettlement(data2)
+          .then(res => {
+            console.log(res);
+            console.log("成功!!!");
+            if (
+              this.allSpend > this.Initial_balance &&
+              this.arrearsFlag != "N"
+            ) {
+              this.$alert(
+                "余额不足，当前订单还需充值" +
+                  (this.allSpend - this.Initial_balance) +
+                  "元才能提交",
+                "提示",
+                {
+                  confirmButtonText: "确定",
+                  type: "warning"
+                }
+              );
+            } else {
+              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+              this.$alert("提交成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
+            }
+          })
+          .then(() => {
+            deleteCurtain(deleteArray); //删除订单信息
+            this.closeToTab({
+              oldUrl: "order/checkOrder",
+              newUrl: "order/myOrder"
+            });
+          });
       });
     },
+    //提交结算
+    payIt() {
+      var url = "/order/getResidemoney.do";
+      var data = {
+        cid: Cookies.get("cid"),
+        companyId: Cookies.get("companyId")
+      };
+      //每次提交的时候判断一下余额
+      queryCash(url, data).then(res => {
+        this.Initial_balance = res.data;
+        var url2 = "/order/orderCount.do";
+        var data2 = {
+          product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
+          promotion_cost: this.totalPrice, //活动价格【】
+          cid: Cookies.get("cid"), //登录用户账号
+          companyId: Cookies.get("companyId"),
+          rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+          rebateM: this.rebateM, //月优惠券编号
+          arrearsFlag: this.arrearsFlag,
+          ctm_order: this.ctm_order,
+          ctm_orders: this.array2
+        };
+        //删除购物车数据
+        var deleteArray = [];
+        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+        for (var i = 0; i < getPush3.length; i++) {
+          deleteArray[i] = getPush3[i].id;
+        }
+        console.log(deleteArray);
+        //console.log(this.ctm_order.deliveryNotes);
+        if (
+          this.ctm_order.deliveryNotes == "" &&
+          this.ctm_order.deliveryType == 3
+        ) {
+          this.$alert("请填写指定的物流公司", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return;
+        }
+        submitOrder(url2, data2)
+          .then(res => {
+            console.log(res);
+            console.log("成功!!!");
+            if (
+              this.allSpend > this.Initial_balance &&
+              this.arrearsFlag != "N"
+            ) {
+              var recordData = {
+                ORDER_NO: res.data.order,
+                OPERATION_PERSON: Cookies.get("cid"),
+                OPERATION_NAME: "创建未提交",
+                OPERATION_NOTE: "余额不足"
+              };
+              InsertOperationRecord(recordData); //插入操作记录
+              this.$alert(
+                "余额不足，当前订单还需充值" +
+                  (this.allSpend - this.Initial_balance) +
+                  "元才能提交",
+                "提示",
+                {
+                  confirmButtonText: "确定",
+                  type: "warning"
+                }
+              );
+            } else {
+              var recordData = {
+                ORDER_NO: res.data.order,
+                OPERATION_PERSON: Cookies.get("cid"),
+                OPERATION_NAME: "创建并提交"
+              };
+              InsertOperationRecord(recordData); //插入操作记录
+              this.$alert("提交成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
+            }
+          })
+          .then(() => {
+            DeleteShopRecord(deleteArray); //删除订单信息
+            this.closeToTab({
+              oldUrl: "order/checkOrder",
+              newUrl: "order/myOrder"
+            });
+          });
+      });
+    },
+    ...mapMutations("navTabs", ["addTab"]),
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //查询经办人
     chargeQuery() {
       var url = "/order/getlink.do";
@@ -1412,7 +1426,6 @@ export default {
     this.allAddress(); //获取地址
     this.huodongjia(); //获取活动价
     this._getTickets(); //获取优惠券
-    this.queryMoney(); //余额
     this.chargeQuery(); //经办人
     this.cid = Cookies.get("cid");
     this.realName = Cookies.get("realName");
