@@ -1,12 +1,6 @@
 <template>
   <el-card class="centerCard">
-    <el-dialog
-      title="窗帘详情"
-      :show-close="true"
-      :visible.sync="detailVisible"
-      width="92%"
-      top="5vh"
-    >
+    <el-dialog title="窗帘详情" :show-close="true" :visible.sync="detailVisible" width="92%" top="5vh">
       <keep-alive>
         <detailCurtainTable
           v-if="detailVisible"
@@ -596,7 +590,7 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             });
-            this.$root.$emit('refreshMoneyEvent');//触发主页面刷新余额
+            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
             this.addTab("order/myOrder");
             this.closeTab("order/orderDetail");
           });
@@ -612,10 +606,12 @@ export default {
           return;
         } else if (index == 5 || index == 6 || index == 7 || index == 8) {
           var values = data.map(item => Number(item[column.property]));
+          var cancelIndex = data.map(item => Number(item["STATUS_ID"])); //取得状态判断是否是作废的
           if (!values.every(value => isNaN(value))) {
-            sums[index] = values.reduce((prev, curr) => {
+            sums[index] = values.reduce((prev, curr, index) => {
               const value = Number(curr);
-              if (!isNaN(value)) {
+              if (!isNaN(value) && cancelIndex[index] != "3") {
+                //作废的不统计
                 return prev + curr;
               } else {
                 return prev;
@@ -635,6 +631,9 @@ export default {
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
+      if (row.STATUS_ID == "3") {
+        return "fuck-row";
+      }
       if (rowIndex % 2 == 0) {
         return "success-row";
       }
@@ -694,6 +693,11 @@ export default {
 <style>
 .el-table .success-row {
   background: #f0f9eb;
+}
+.el-table .fuck-row {
+  background: #f0f9eb;
+  color: tomato;
+  text-decoration: line-through;
 }
 .centerCard .el-dialog__body {
   padding: 10px;

@@ -137,11 +137,7 @@ import {
   orderDetail,
   defeatChange
 } from "@/api/orderList";
-import {
-  updateCurtainOrder,
-  InsertOperationRecord,
-  getOperationRecord
-} from "@/api/orderListASP";
+import { updateCurtainOrder, getOperationRecord } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";

@@ -13,7 +13,7 @@
             @select="addTab"
             :collapse="asideStatus"
           >
-           <!-- <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item"></menuTree> -->
+            <!-- <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item"></menuTree> -->
             <el-submenu index="shops">
               <template slot="title">
                 <i class="iconfont icon-color">&#xe624;</i>
@@ -244,7 +244,12 @@
                 <strong>
                   <i>{{moneySituation}}</i>
                 </strong>
-                <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;" @click="refreshUserMoney"></i>
+                <i
+                  title="刷新余额"
+                  :class="refreshMoneyClass"
+                  style="color:black;cursor:pointer;"
+                  @click="refreshUserMoney"
+                ></i>
               </span>
             </div>
             <el-tab-pane
@@ -274,7 +279,7 @@ import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Vue from "vue";
 import Cookies from "js-cookie";
-import menuTree from "./menuTree"
+import menuTree from "./menuTree";
 
 export default {
   name: "Main",
@@ -306,7 +311,7 @@ export default {
       moneySituation: "",
       Initial_balance: 0,
       getTheTab: "",
-      refreshMoneyClass:'el-icon-refresh-left'
+      refreshMoneyClass: "el-icon-refresh-left"
       // dialogFormVisible: false,       //伪登录
       // formLabelWidth: '120px'
     };
@@ -378,8 +383,8 @@ export default {
     },
     //获取用户余额情况
     async userMoney() {
-      this.refreshMoneyClass = 'el-icon-loading';
-      this.moneySituation ='';
+      this.refreshMoneyClass = "el-icon-loading";
+      this.moneySituation = "";
       getUserMoney(
         {
           cid: this.cid,
@@ -397,13 +402,13 @@ export default {
           } else {
             this.moneySituation = "当前余额 " + res.data + "元";
           }
-          this.refreshMoneyClass = 'el-icon-refresh-left';
+          this.refreshMoneyClass = "el-icon-refresh-left";
         })
         .catch(err => {
           //console.log(err);
         });
     },
-    refreshUserMoney(){
+    refreshUserMoney() {
       this.userMoney();
     },
     //按钮样式--菜单展开收起
@@ -471,7 +476,7 @@ export default {
     }
   },
   computed: {
-    ...mapState("navTabs", ["tabList","menuTreeList"]),
+    ...mapState("navTabs", ["tabList", "menuTreeList"]),
     getRefund() {
       return this.$store.getters["badge/getRefund"];
     },
@@ -567,9 +572,9 @@ export default {
       }
     };
     //可以从其他页面触发刷新余额
-    this.$root.$on('refreshMoneyEvent',()=>{
+    this.$root.$on("refreshMoneyEvent", () => {
       this.userMoney();
-    })
+    });
     // console.log(this.defaultUrl);
   },
   beforeDestroy() {

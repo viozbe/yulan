@@ -148,13 +148,15 @@
               >提交订单</el-button>
             </p>
           </router-link>
-          <el-button
-            v-if="item.STATUS_ID==5||item.STATUS_ID==6"
-            @click="refreshPay(item)"
-            size="medium"
-            type="danger"
-            plain
-          >提交订单</el-button>
+          <p>
+            <el-button
+              v-if="item.STATUS_ID==5||item.STATUS_ID==6"
+              @click="refreshPay(item)"
+              size="medium"
+              type="danger"
+              plain
+            >提交订单</el-button>
+          </p>
           <router-link to="/order/checkExamine">
             <p>
               <el-button
@@ -183,7 +185,11 @@
 
 <script>
 import { getOrderlist, passExamine } from "@/api/orderList";
-import { getAllOrders, InsertOperationRecord } from "@/api/orderListASP";
+import {
+  getAllOrders,
+  InsertOperationRecord,
+  cancelOrderNew
+} from "@/api/orderListASP";
 import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -600,6 +606,7 @@ export default {
     deleteOrder(pushOrderNum) {
       var url = "/order/cancelOrder.do";
       var data = {
+        cid: Cookies.get("cid"),
         orderNo: pushOrderNum
       };
       this.$confirm("确定取消订单？", "提示", {
@@ -608,18 +615,14 @@ export default {
         type: "warning"
       })
         .then(() => {
-          cancelOrder(url, data).then(res => {
-            var recordData = {
-              ORDER_NO: pushOrderNum,
-              OPERATION_PERSON: Cookies.get("cid"),
-              OPERATION_NAME: "作废订单"
-            };
-            InsertOperationRecord(recordData); //插入操作记录
-            this.refresh();
+          //cancelOrder(url, data).then(res => {
+          cancelOrderNew(data).then(res => {
             this.$alert("删除成功", "提示", {
               confirmButtonText: "确定",
               type: "success"
             });
+            this.refresh();
+            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
           });
           //预留接口-删除订单
         })
@@ -666,7 +669,7 @@ export default {
               type: "success"
             });
             this.refresh();
-            this.$root.$emit('refreshMoneyEvent');//触发刷新余额
+            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
           });
         }
       });

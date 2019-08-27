@@ -102,13 +102,9 @@
             <el-button v-else type="success" @click="NewAddress('form')">确认添加</el-button>
           </div>
         </el-dialog>
-        <!-- 
-              <div slot="footer" class="dialog-footer">      123    
-                
-        </div>-->
       </el-dialog>
       <!-- 查看使用记录 -->
-      <el-dialog title="优惠券使用记录" :visible.sync="dialogUse" width="70%">
+      <el-dialog title="优惠券使用记录" :visible.sync="dialogUse" width="70%" top="5vh">
         <!-- :before-close="handleClose" -->
         <el-table
           empty-text="暂无使用记录"
@@ -136,7 +132,7 @@
         </span>
       </el-dialog>
       <!-- 查看返利记录 -->
-      <el-dialog title="优惠券返利记录" :visible.sync="dialogBack" width="70%">
+      <el-dialog title="优惠券返利记录" :visible.sync="dialogBack" width="70%" top="5vh">
         <!-- :before-close="handleClose" -->
         <el-table
           empty-text="暂无返利记录"
@@ -381,7 +377,11 @@ import { submitOrder } from "@/api/orderList";
 import { CouponUseRecord } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
 import { curtainPay } from "@/api/orderList";
-import { orderSettlement, InsertOperationRecord } from "@/api/orderListASP";
+import {
+  orderSettlement,
+  normalOrderSettlement,
+  InsertOperationRecord
+} from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
 /* import { mapMutations } from 'vuex' 
@@ -1246,12 +1246,18 @@ export default {
         }
         orderSettlement(data2)
           .then(res => {
-            console.log(res);
-            console.log("成功!!!");
+            //活动类型"N"或者应付为0不需要判断余额
             if (
-              this.allSpend > this.Initial_balance &&
-              this.arrearsFlag != "N"
+              this.allSpend == 0 ||
+              this.arrearsFlag == "N" ||
+              this.allSpend <= this.Initial_balance
             ) {
+              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+              this.$alert("提交成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
+            } else {
               this.$alert(
                 "余额不足，当前订单还需充值" +
                   (this.allSpend - this.Initial_balance) +
@@ -1262,12 +1268,6 @@ export default {
                   type: "warning"
                 }
               );
-            } else {
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success"
-              });
             }
           })
           .then(() => {
@@ -1319,21 +1319,23 @@ export default {
           });
           return;
         }
-        submitOrder(url2, data2)
+        //submitOrder(url2, data2)
+        normalOrderSettlement(data2)
           .then(res => {
             console.log(res);
             console.log("成功!!!");
+            //活动类型"N"或者应付为0不需要判断余额
             if (
-              this.allSpend > this.Initial_balance &&
-              this.arrearsFlag != "N"
+              this.allSpend == 0 ||
+              this.arrearsFlag == "N" ||
+              this.allSpend <= this.Initial_balance
             ) {
-              var recordData = {
-                ORDER_NO: res.data.order,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "创建未提交",
-                OPERATION_NOTE: "余额不足"
-              };
-              InsertOperationRecord(recordData); //插入操作记录
+              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+              this.$alert("提交成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
+            } else {
               this.$alert(
                 "余额不足，当前订单还需充值" +
                   (this.allSpend - this.Initial_balance) +
@@ -1344,17 +1346,6 @@ export default {
                   type: "warning"
                 }
               );
-            } else {
-              var recordData = {
-                ORDER_NO: res.data.order,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "创建并提交"
-              };
-              InsertOperationRecord(recordData); //插入操作记录
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success"
-              });
             }
           })
           .then(() => {

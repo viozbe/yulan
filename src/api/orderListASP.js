@@ -26,9 +26,22 @@ export function getAllOrders(data, config = {}) {
         return Promise.reject(err);
     })
 }
-//订单提交，再次提交
+//窗帘订单提交，再次提交
 export function orderSettlement(data, config = {}) {
     return post('/CTM_ORDER/orderSettlement', data, config).then((res) => {
+        if (res.code === 0 || res.success) {
+            return Promise.resolve(res);
+        }
+        else {
+            return Promise.reject(res);
+        }
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//墙纸和软装的订单提交
+export function normalOrderSettlement(data, config = {}) {
+    return post('/CTM_ORDER/normalOrderSettlement', data, config).then((res) => {
         if (res.code === 0 || res.success) {
             return Promise.resolve(res);
         }
@@ -68,6 +81,19 @@ export function InsertOperationRecord(data, config = {}) {
 //获得拼接好的操作记录
 export function getOperationRecord(data, config = {}) {
     return post('/ORDER_OPERATION_RECORD/getOperationRecord', data, config).then((res) => {
+        if (res.code === 0 || res.success) {
+            return Promise.resolve(res);
+        }
+        else {
+            return Promise.reject(res);
+        }
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//作废订单
+export function cancelOrderNew(data, config = {}) {
+    return post('/CTM_ORDER/cancelOrder', data, config).then((res) => {
         if (res.code === 0 || res.success) {
             return Promise.resolve(res);
         }
