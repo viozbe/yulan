@@ -12,7 +12,7 @@
                         @keyup.enter.native="_getShopsWallPaperMsg"
                         placeholder="输入商品型号查找商品"
                         style="width:25%; min-width:280px;">
-                        <div id="searchBtn" slot="append" @click="_getShopsWallPaperMsg">搜索</div>
+                        <div id="searchBtn" slot="append" style="cursor:pointer;" @click="_getShopsWallPaperMsg">搜索</div>
                     </el-input>
                     <div id="searchHistory" style="margin: 5px 0 0">
                         <ul class="ovh l" style="font-size: 12px;">

@@ -8,11 +8,11 @@
       <div
         v-for="(item,index) of couponData"
         :key="index"
-        :class="item.dateId!=1||item.rebateMoneyOver==0?switchClass.cctvF:switchClass.cctvT"
+        :class="item.dateId!=1||item.rebateMoneyOver<=0?switchClass.cctvF:switchClass.cctvT"
       >
         <!--v-if="item.dateId!='0'" @click="useCoupon(item.id,item.rebateType)"-->
         <div class="couponHead">
-          <div :class="item.dateId!=1||item.rebateMoneyOver==0?switchClass.logoF:switchClass.logoT"></div>
+          <div :class="item.dateId!=1||item.rebateMoneyOver<=0?switchClass.logoF:switchClass.logoT"></div>
           <div class="logoTxt">
             <p
               style="color:white; font-size:15px; padding-top:5px; font-weight:bold; letter-spacing:2px;"
@@ -24,7 +24,7 @@
 
         <div class="couponBody">
           <p
-            :class="item.dateId!=1||item.rebateMoneyOver==0?switchClass.transTxtF:switchClass.transTxtT"
+            :class="item.dateId!=1||item.rebateMoneyOver<=0?switchClass.transTxtF:switchClass.transTxtT"
             style="text-align:center"
           >
             <span style="font-size:18px;">余额￥</span>
@@ -33,7 +33,7 @@
           </p>
           <div style="margin:0 auto; width:245px;">
             <div
-              :class="item.dateId!=1||item.rebateMoneyOver==0?switchClass.roundedRectangleF:switchClass.roundedRectangleT"
+              :class="item.dateId!=1||item.rebateMoneyOver<=0?switchClass.roundedRectangleF:switchClass.roundedRectangleT"
             >
               <p>&nbsp;&nbsp;&nbsp;有效期：{{item.dateStart |datatrans}}至&nbsp;&nbsp;{{item.dateEnd |datatrans}}</p>
             </div>
@@ -48,65 +48,19 @@
       </div>
     </div>
     <!-- 查看使用记录 -->
-    <el-dialog title="优惠券使用记录" :visible.sync="dialogUse" width="70%" top="5vh">
-      <!-- :before-close="handleClose" -->
-      <el-table
-        empty-text="暂无使用记录"
-        :data="useTable"
-        style="width: 100%"
-        :row-class-name="tableRowClassName"
-      >
-        <el-table-column align="center" prop="id" label="券号"></el-table-column>
-        <el-table-column align="center" prop="orderNo" label="订单号"></el-table-column>
-        <el-table-column align="center" prop="itemNo" label="商品型号"></el-table-column>
-        <el-table-column align="center" label="使用时间">
-          <template slot-scope="scope1">
-            <span>{{scope1.row.dateUse |datatrans}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="使用金额">
-          <template slot-scope="scope1">
-            <span v-if="isManager === '0'">***</span>
-            <span v-else>{{scope1.row.rebateMoney}}</span>
-          </template>
-        </el-table-column>
-      </el-table>
+    <el-dialog :title="'优惠券使用记录[券号:'+useTable.couponId+']'" :visible.sync="dialogUse" width="70%" top="5vh">
+      <keep-alive>
+      <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
+      </keep-alive>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogUse = false">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 查看返利记录 -->
-    <el-dialog title="优惠券返利记录" :visible.sync="dialogBack" width="70%" top="5vh">
-      <!-- :before-close="handleClose" -->
-      <el-table
-        empty-text="暂无返利记录"
-        :data="backTable"
-        style="width: 100%"
-        :row-class-name="tableRowClassName"
-      >
-        <el-table-column align="center" label="优惠券类型">
-          <template slot-scope="scope1">
-            <span>{{scope1.row.rebateType |nameTrans}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="创建日期">
-          <template slot-scope="scope1">
-            <span>{{scope1.row.dateCre |datatrans}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="有效期">
-          <template slot-scope="scope1">
-            <span>{{scope1.row.dateStart |datatrans}}至{{scope1.row.dateEnd |datatrans}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="返利金额">
-          <template slot-scope="scope1">
-            <span v-if="isManager === '0'">***</span>
-            <span v-else>{{scope1.row.returnMoney}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="notes" align="center" label="备注说明"></el-table-column>
-      </el-table>
+    <el-dialog :title="'优惠券返利记录[券号:'+backTable.couponId+']'" :visible.sync="dialogBack" width="70%" top="5vh">
+      <keep-alive>
+      <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
+      </keep-alive>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogBack = false">关闭</el-button>
       </span>
@@ -120,8 +74,16 @@ import { manageCoupon } from "@/api/orderList";
 import { CouponUseRecord } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
 import Cookies from "js-cookie";
+import useRecordDetail from "./useRecordDetail";
+import couponRecordDetail from "./couponRecordDetail";
+import {getUseRecord} from "@/api/orderListASP";
+
 export default {
   name: "MyCoupon",
+  components: {
+    useRecordDetail,
+    couponRecordDetail
+  },
   data() {
     return {
       isManager: Cookies.get("isManager"),
@@ -169,13 +131,24 @@ export default {
     RecordUse(itemID) {
       this.useTable = [];
       var url = "/order/findRecrods.do";
+      // var data = {
+      //   id: itemID
+      // };
       var data = {
-        id: itemID
+        couponId: itemID,
+        keyWords: "",
+        beginTime: "0001/1/1",
+        finishTime: "9999/12/31",
+        page: 1,
+        limit: 20
       };
-      CouponUseRecord(url, data).then(res => {
+      //CouponUseRecord(url, data)
+      getUseRecord(data).then(res => {
         console.log(res);
         console.log(res.data);
         this.useTable = res.data;
+        this.useTable.couponId = itemID;
+        this.useTable.count = res.count;
         this.dialogUse = true;
       });
     },
@@ -188,15 +161,9 @@ export default {
         console.log(res);
         console.log(res.data);
         this.backTable = res.data;
+        this.backTable.couponId = itemId;
         this.dialogBack = true;
       });
-    },
-    //隔行变色
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 == 0) {
-        return "success-row";
-      }
-      return "";
     }
   },
   filters: {
@@ -215,17 +182,9 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
-    },
-    nameTrans(value) {
-      if (value == "year") {
-        return "年返券";
-      } else if (value == "month") {
-        return "月返券";
-      } else return "其它券类";
     }
   },
   created: function() {
-    // this._getTickets()
     this.allTickets();
   }
 };
@@ -346,6 +305,7 @@ export default {
     rgb(253, 128, 67) 50%,
     rgb(253, 168, 77) 100%
   );
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -360,5 +320,8 @@ export default {
 <style>
 .el-table .success-row {
   background: #f0f9eb;
+}
+.centerCard .el-dialog__body {
+  padding: 10px;
 }
 </style>

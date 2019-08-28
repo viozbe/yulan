@@ -104,3 +104,29 @@ export function cancelOrderNew(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//优惠券使用记录
+export function getUseRecord(data, config = {}) {
+    return post('/SAL_REBATE_CERTIFICATE_RECORD/getUseRecord', data, config).then((res) => {
+        if (res.code === 0 || res.success) {//放到外面判断，有些返回不会返回是否成功，直接返回数据
+            return Promise.resolve(res);
+        }
+        else {
+            return Promise.reject(res);
+        }
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//使用记录汇总
+export function getTotalRecordSum(data, config = {}) {
+    return post('/SAL_REBATE_CERTIFICATE_RECORD/getTotalRecordSum', data, config).then((res) => {
+        if (res.code === 0 || res.success) {//放到外面判断，有些返回不会返回是否成功，直接返回数据
+            return Promise.resolve(res);
+        }
+        else {
+            return Promise.reject(res);
+        }
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

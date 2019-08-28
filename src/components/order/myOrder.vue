@@ -530,12 +530,9 @@ export default {
         data.finishTime = data.finishTime + " 23:59:59";
       }
       getAllOrders(data).then(res => {
-        console.log(res);
         this.count = res.count;
-        console.log(res.count);
         this.data = [];
         this.data = res.data;
-        console.log(this.data);
       });
     },
     //出货详情

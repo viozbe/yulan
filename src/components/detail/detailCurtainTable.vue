@@ -323,7 +323,7 @@
                         v-model.trim="searchKey"
                         @clear="getAllItemNoData(1)"
                         @keyup.enter.native="getSingleItemNoData(1)">
-                        <div id="searchBtn" slot="append" @click="getSingleItemNoData(1)">搜索</div>
+                        <div id="searchBtn" slot="append" style="cursor:pointer;" @click="getSingleItemNoData(1)">搜索</div>
                     </el-input>
                     <br>
                     <el-radio border size="small"

@@ -13,7 +13,7 @@
                             @keyup.enter.native="searchSoftSuit(0)"
                             placeholder="输入商品型号查找商品"
                             style="width:25%; min-width:280px;">
-                            <div id="searchBtn" slot="append" @click="searchSoftSuit(0)">搜索</div>
+                            <div id="searchBtn" slot="append" style="cursor:pointer;" @click="searchSoftSuit(0)">搜索</div>
                         </el-input>
                     </div>
                     <el-tab-pane lazy

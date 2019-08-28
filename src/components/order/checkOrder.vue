@@ -104,65 +104,17 @@
         </el-dialog>
       </el-dialog>
       <!-- 查看使用记录 -->
-      <el-dialog title="优惠券使用记录" :visible.sync="dialogUse" width="70%" top="5vh">
-        <!-- :before-close="handleClose" -->
-        <el-table
-          empty-text="暂无使用记录"
-          :data="useTable"
-          style="width: 100%"
-          :row-class-name="tableRowClassName"
-        >
-          <el-table-column align="center" prop="id" label="券号"></el-table-column>
-          <el-table-column align="center" prop="orderNo" label="订单号"></el-table-column>
-          <el-table-column align="center" prop="itemNo" label="商品型号"></el-table-column>
-          <el-table-column align="center" label="使用时间">
-            <template slot-scope="scope1">
-              <span>{{scope1.row.dateUse |datatrans}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="使用金额">
-            <template slot-scope="scope1">
-              <span v-if="isManager === '0'">***</span>
-              <span v-else>{{scope1.row.rebateMoney}}</span>
-            </template>
-          </el-table-column>
-        </el-table>
+      <el-dialog :title="'优惠券使用记录[券号:'+useTable.couponId+']'" :visible.sync="dialogUse" width="70%" top="5vh">
+        <keep-alive>
+        <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
+        </keep-alive>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogUse = false">关闭</el-button>
         </span>
       </el-dialog>
       <!-- 查看返利记录 -->
-      <el-dialog title="优惠券返利记录" :visible.sync="dialogBack" width="70%" top="5vh">
-        <!-- :before-close="handleClose" -->
-        <el-table
-          empty-text="暂无返利记录"
-          :data="backTable"
-          style="width: 100%"
-          :row-class-name="tableRowClassName"
-        >
-          <el-table-column align="center" label="优惠券类型">
-            <template slot-scope="scope1">
-              <span>{{scope1.row.rebateType |nameTrans}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="创建日期">
-            <template slot-scope="scope1">
-              <span>{{scope1.row.dateCre |datatrans}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="有效期">
-            <template slot-scope="scope1">
-              <span>{{scope1.row.dateStart |datatrans}}至{{scope1.row.dateEnd |datatrans}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="返利金额">
-            <template slot-scope="scope1">
-              <span v-if="isManager === '0'">***</span>
-              <span v-else>{{scope1.row.returnMoney}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="notes" align="center" label="备注说明"></el-table-column>
-        </el-table>
+      <el-dialog :title="'优惠券返利记录[券号:'+backTable.couponId+']'" :visible.sync="dialogBack" width="70%" top="5vh">
+        <couponRecordDetail :backTable="backTable"></couponRecordDetail>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogBack = false">关闭</el-button>
         </span>
@@ -380,16 +332,20 @@ import { curtainPay } from "@/api/orderList";
 import {
   orderSettlement,
   normalOrderSettlement,
-  InsertOperationRecord
+  InsertOperationRecord,getUseRecord
 } from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
-/* import { mapMutations } from 'vuex' 
-import { mapState } from 'vuex' */
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
+import useRecordDetail from "../center/useRecordDetail";
+import couponRecordDetail from "../center/couponRecordDetail";
 export default {
   name: "checkOrder",
+  components: {
+    useRecordDetail,
+    couponRecordDetail
+  },
   data() {
     return {
       arrearsFlag: "",
@@ -643,7 +599,7 @@ export default {
         console.log(res.data);
         this.couponData = res.data;
         for (let i = 0; i < this.couponData.length; i++) {
-          if (this.couponData[i].dateId === 0) {
+          if (this.couponData[i].dateId === 0 || this.couponData[i].rebateMoneyOver <=0) {
             this.couponData.splice(i, 1);
           }
         }
@@ -652,12 +608,24 @@ export default {
     RecordUse(itemID) {
       this.useTable = [];
       var url = "/order/findRecrods.do";
+      // var data = {
+      //   id: itemID
+      // };
       var data = {
-        id: itemID
+        couponId: itemID,
+        keyWords: "",
+        beginTime: "0001/1/1",
+        finishTime: "9999/12/31",
+        page: 1,
+        limit: 20
       };
-      CouponUseRecord(url, data).then(res => {
+      //CouponUseRecord(url, data)
+      getUseRecord(data).then(res => {
         console.log(res);
+        console.log(res.data);
         this.useTable = res.data;
+        this.useTable.couponId = itemID;
+        this.useTable.count = res.count;
         this.dialogUse = true;
       });
     },
@@ -669,6 +637,7 @@ export default {
       CouponbackRecord(url, data).then(res => {
         console.log(res);
         this.backTable = res.data;
+        this.backTable.couponId = itemId;
         this.dialogBack = true;
       });
     },
@@ -1534,6 +1503,7 @@ export default {
     rgb(253, 128, 67) 50%,
     rgb(253, 168, 77) 100%
   );
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

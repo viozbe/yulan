@@ -283,6 +283,9 @@ import menuTree from "./menuTree";
 
 export default {
   name: "Main",
+  components: {
+    menuTree
+  },
   data() {
     return {
       cid: Cookies.get("cid"),
@@ -579,9 +582,6 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.moneyTimer);
-  },
-  components: {
-    menuTree
   },
   watch: {}
 };

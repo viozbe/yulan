@@ -13,7 +13,7 @@
                         @keyup.enter.native="getDataBlur(1)"
                         placeholder="输入商品型号查找商品"
                         style="width:25%; min-width:250px;">
-                        <div id="searchBtn" slot="append" @click="getDataBlur(1)">搜索</div>
+                        <div id="searchBtn" slot="append" style="cursor:pointer;" @click="getDataBlur(1)">搜索</div>
                     </el-input>
                 </div>
                 <el-table class="loading-area"
@@ -408,15 +408,8 @@ a:hover{ cursor: pointer; }
     width: 47%;
     display: inline-block;
 }
-#searchButton{
-    width: 20%; 
-    height: 40px; 
-    display: inline-block;
-    text-align: center;
-    background:#8BC34A;
-    color: white;
-    line-height: 40px;
-    margin: 0 -10px;
+#searchBtn{
+    color: #101010;
     cursor: pointer;
 }
 </style>
