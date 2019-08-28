@@ -48,7 +48,7 @@
       </div>
     </div>
     <!-- 查看使用记录 -->
-    <el-dialog :title="'优惠券使用记录[券号:'+useTable.couponId+']'" :visible.sync="dialogUse" width="70%" top="5vh">
+    <el-dialog :title="'优惠券使用记录[券号:'+useTable.couponId+']'" :visible.sync="dialogUse" width="60%" top="5vh">
       <keep-alive>
       <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
       </keep-alive>
@@ -57,7 +57,7 @@
       </span>
     </el-dialog>
     <!-- 查看返利记录 -->
-    <el-dialog :title="'优惠券返利记录[券号:'+backTable.couponId+']'" :visible.sync="dialogBack" width="70%" top="5vh">
+    <el-dialog :title="'优惠券返利记录[券号:'+backTable.couponId+']'" :visible.sync="dialogBack" width="60%" top="5vh">
       <keep-alive>
       <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
       </keep-alive>
