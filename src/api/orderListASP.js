@@ -143,3 +143,16 @@ export function copyCartItem(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//获得ITEM
+export function getItemById(data, config = {}) {
+    return post('/ITEM/getItemById', data, config).then((res) => {
+        if (res.code === 0 || res.success) {//放到外面判断，有些返回不会返回是否成功，直接返回数据
+            return Promise.resolve(res);
+        }
+        else {
+            return Promise.reject(res);
+        }
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

@@ -114,11 +114,12 @@ Vue.component('currency-input', {
       return this.customClass || 'el-input--mini'
     }
   },
-  props: ['value', 'placeholder', 'customClass', 'customStyle'],
+  props: ['value', 'placeholder', 'customClass', 'customStyle', "decimalNum"],
   methods: {
     // 不是直接更新值，而是使用此方法来对输入值进行格式化和位数限制
     updateValue: function (value) {
       var formattedValue = value;
+      var decimalNum = this.decimalNum ? this.decimalNum : 2;//保留位数控制
       formattedValue = value
         //先把非数字的都替换掉，除了数字和小数点
         .replace(/[^\d\.]/g, '')
@@ -134,23 +135,8 @@ Vue.component('currency-input', {
           0,
           value.indexOf('.') === -1
             ? value.length
-            : value.indexOf('.') + 3
+            : value.indexOf('.') + (decimalNum + 1)
         )
-      // formattedValue = formattedValue.replace(/^\./g, '');
-      // //保证只有出现一个小数点而没有多个. 
-      // formattedValue.value = formattedValue.replace(/\.{2,}/g, '.');
-      // //保证小数点只出现一次，而不能出现两次以上 
-      // formattedValue.value = formattedValue.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
-      // var formattedValue = value
-      //   // 删除两侧的空格符
-      //   .trim()
-      //   // 保留 2 位小数
-      //   .slice(
-      //     0,
-      //     value.indexOf('.') === -1
-      //       ? value.length
-      //       : value.indexOf('.') + 3
-      //   )
       // // 如果值尚不合规，则手动覆盖为合规的值
       if (formattedValue !== value) {
         this.$refs.input.value = formattedValue

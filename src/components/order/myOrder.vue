@@ -86,7 +86,7 @@
             v-if="item.STATUS_ID==3 && item.ORDER_NO.slice(0, 1) == 'X'"
             class="item"
             effect="dark"
-            content="复制原始购物车数据到购物车"
+            content="退回数据到购物车"
             placement="top"
           >
             <i
@@ -631,7 +631,7 @@ export default {
             .then(res => {
               if (pushOrderNum.slice(0, 1) == "X") {
                 this.$confirm(
-                  "作废成功，是否将该订单原购物车数据复制到购物车中？",
+                  "作废成功，是否退回数据到购物车？",
                   "提示",
                   {
                     confirmButtonText: "是",
@@ -673,7 +673,7 @@ export default {
         });
     },
     copyCart(orderNo) {
-      this.$confirm("是否将该订单原购物车数据复制到购物车中？", "提示", {
+      this.$confirm("是否是否退回数据到购物车？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning"
