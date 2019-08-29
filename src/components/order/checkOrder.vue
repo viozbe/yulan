@@ -104,16 +104,26 @@
         </el-dialog>
       </el-dialog>
       <!-- 查看使用记录 -->
-      <el-dialog :title="'优惠券使用记录[券号:'+useTable.couponId+']'" :visible.sync="dialogUse" width="60%" top="5vh">
+      <el-dialog
+        :title="'优惠券使用记录[券号:'+useTable.couponId+']'"
+        :visible.sync="dialogUse"
+        width="60%"
+        top="5vh"
+      >
         <keep-alive>
-        <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
+          <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
         </keep-alive>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogUse = false">关闭</el-button>
         </span>
       </el-dialog>
       <!-- 查看返利记录 -->
-      <el-dialog :title="'优惠券返利记录[券号:'+backTable.couponId+']'" :visible.sync="dialogBack" width="60%" top="5vh">
+      <el-dialog
+        :title="'优惠券返利记录[券号:'+backTable.couponId+']'"
+        :visible.sync="dialogBack"
+        width="60%"
+        top="5vh"
+      >
         <couponRecordDetail :backTable="backTable"></couponRecordDetail>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogBack = false">关闭</el-button>
@@ -301,13 +311,13 @@
         </p>
         <el-button @click="backToOrder" size="medium" type="success" plain>返回订单</el-button>
         <el-button v-if="curtainStatus =='0'" @click="payIt" size="medium" type="danger" plain>立即提交</el-button>
-        <el-button
+        <!-- <el-button
           v-if="curtainStatus =='1'"
           @click="payCurtain()"
           size="medium"
           type="danger"
           plain
-        >确认提交</el-button>
+        >确认提交</el-button>-->
         <el-button v-if="curtainStatus =='3'" @click="payNew" size="medium" type="danger" plain>确认提交</el-button>
       </div>
     </el-card>
@@ -332,7 +342,8 @@ import { curtainPay } from "@/api/orderList";
 import {
   orderSettlement,
   normalOrderSettlement,
-  InsertOperationRecord,getUseRecord
+  InsertOperationRecord,
+  getUseRecord
 } from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
@@ -599,7 +610,10 @@ export default {
         console.log(res.data);
         this.couponData = res.data;
         for (let i = 0; i < this.couponData.length; i++) {
-          if (this.couponData[i].dateId === 0 || this.couponData[i].rebateMoneyOver <=0) {
+          if (
+            this.couponData[i].dateId === 0 ||
+            this.couponData[i].rebateMoneyOver <= 0
+          ) {
             this.couponData.splice(i, 1);
           }
         }
@@ -1125,58 +1139,58 @@ export default {
       }
       this.ORDERBODY = this.array2;
     },
-    //窗帘提交结算
-    payCurtain() {
-      var url = "/order/curOrderCount.do";
-      this.ctm_order.orderNo = this.array2[0].orderNo; //真的是傻逼接口
-      this.ctm_order.curtainStatusId = "1";
-      console.log(this.ctm_order);
-      var data = {
-        product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
-        promotion_cost: this.totalPrice, //活动价格【】
-        cid: Cookies.get("cid"), //登录用户账号
-        companyId: Cookies.get("companyId"),
-        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-        rebateM: this.rebateM, //月优惠券编号
-        arrearsFlag: this.arrearsFlag,
-        ctm_order: this.ctm_order,
-        ctm_orders: this.array2
-      };
-      console.log(data);
+    // //窗帘提交结算
+    // payCurtain() {
+    //   var url = "/order/curOrderCount.do";
+    //   this.ctm_order.orderNo = this.array2[0].orderNo; //真的是傻逼接口
+    //   this.ctm_order.curtainStatusId = "1";
+    //   console.log(this.ctm_order);
+    //   var data = {
+    //     product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
+    //     promotion_cost: this.totalPrice, //活动价格【】
+    //     cid: Cookies.get("cid"), //登录用户账号
+    //     companyId: Cookies.get("companyId"),
+    //     rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+    //     rebateM: this.rebateM, //月优惠券编号
+    //     arrearsFlag: this.arrearsFlag,
+    //     ctm_order: this.ctm_order,
+    //     ctm_orders: this.array2
+    //   };
+    //   console.log(data);
 
-      if (
-        this.ctm_order.deliveryNotes == "" &&
-        this.ctm_order.deliveryType == 3
-      ) {
-        this.$alert("请填写指定的物流公司", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-        return;
-      }
-      curtainPay(url, data)
-        .then(res => {
-          console.log(res);
-          console.log("成功!!!");
-          if (this.allSpend > this.Initial_balance && this.arrearsFlag != "N") {
-            this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            });
-          } else {
-            this.$alert("提交成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            });
-          }
-        })
-        .then(() => {
-          this.closeToTab({
-            oldUrl: "order/checkOrder",
-            newUrl: "order/myOrder"
-          });
-        });
-    },
+    //   if (
+    //     this.ctm_order.deliveryNotes == "" &&
+    //     this.ctm_order.deliveryType == 3
+    //   ) {
+    //     this.$alert("请填写指定的物流公司", "提示", {
+    //       confirmButtonText: "确定",
+    //       type: "warning"
+    //     });
+    //     return;
+    //   }
+    //   curtainPay(url, data)
+    //     .then(res => {
+    //       console.log(res);
+    //       console.log("成功!!!");
+    //       if (this.allSpend > this.Initial_balance && this.arrearsFlag != "N") {
+    //         this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
+    //           confirmButtonText: "确定",
+    //           type: "success"
+    //         });
+    //       } else {
+    //         this.$alert("提交成功", "提示", {
+    //           confirmButtonText: "确定",
+    //           type: "success"
+    //         });
+    //       }
+    //     })
+    //     .then(() => {
+    //       this.closeToTab({
+    //         oldUrl: "order/checkOrder",
+    //         newUrl: "order/myOrder"
+    //       });
+    //     });
+    // },
     payNew() {
       var url = "/order/getResidemoney.do";
       var data = {
@@ -1240,7 +1254,7 @@ export default {
             }
           })
           .then(() => {
-            deleteCurtain(deleteArray); //删除订单信息
+            //deleteCurtain(deleteArray); //删除订单信息（提交一起删除了）
             this.closeToTab({
               oldUrl: "order/checkOrder",
               newUrl: "order/myOrder"
@@ -1259,6 +1273,12 @@ export default {
       queryCash(url, data).then(res => {
         this.Initial_balance = res.data;
         var url2 = "/order/orderCount.do";
+        //删除购物车数据
+        var deleteArray = [];
+        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+        for (var i = 0; i < getPush3.length; i++) {
+          deleteArray[i] = getPush3[i].cartItemId; //使用cartItemId更合理，防止类似窗帘出现打包卖
+        }
         var data2 = {
           product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
           promotion_cost: this.totalPrice, //活动价格【】
@@ -1268,16 +1288,9 @@ export default {
           rebateM: this.rebateM, //月优惠券编号
           arrearsFlag: this.arrearsFlag,
           ctm_order: this.ctm_order,
-          ctm_orders: this.array2
+          ctm_orders: this.array2,
+          cartItemIDs: deleteArray
         };
-        //删除购物车数据
-        var deleteArray = [];
-        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-        for (var i = 0; i < getPush3.length; i++) {
-          deleteArray[i] = getPush3[i].id;
-        }
-        console.log(deleteArray);
-        //console.log(this.ctm_order.deliveryNotes);
         if (
           this.ctm_order.deliveryNotes == "" &&
           this.ctm_order.deliveryType == 3
@@ -1318,7 +1331,7 @@ export default {
             }
           })
           .then(() => {
-            DeleteShopRecord(deleteArray); //删除订单信息
+            //DeleteShopRecord(deleteArray); //删除订单信息（提交一起删除了）
             this.closeToTab({
               oldUrl: "order/checkOrder",
               newUrl: "order/myOrder"

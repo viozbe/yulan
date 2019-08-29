@@ -70,7 +70,7 @@
             class="zoomRight"
           >{{item.STATUS_ID | transStatus}}{{item.CURTAIN_STATUS_ID | curtainStatus}}</span>
           <el-tooltip
-            v-if="item.STATUS_ID==5||item.STATUS_ID==6||item.STATUS_ID==0"
+            v-if="item.STATUS_ID==5||item.STATUS_ID==6||item.STATUS_ID==0||(item.STATUS_ID == 1 && item.CURTAIN_STATUS_ID !==''&& item.CURTAIN_STATUS_ID == 0)"
             class="item"
             effect="dark"
             content="作废订单"
@@ -80,6 +80,19 @@
               style="float:right;cursor: pointer;"
               class="el-icon-delete"
               @click="deleteOrder(item.ORDER_NO)"
+            ></i>
+          </el-tooltip>
+          <el-tooltip
+            v-if="item.STATUS_ID==3 && item.ORDER_NO.slice(0, 1) == 'X'"
+            class="item"
+            effect="dark"
+            content="复制原始购物车数据到购物车"
+            placement="top"
+          >
+            <i
+              style="float:right;cursor: pointer;"
+              class="el-icon-sell"
+              @click="copyCart(item.ORDER_NO)"
             ></i>
           </el-tooltip>
         </div>
@@ -188,7 +201,8 @@ import { getOrderlist, passExamine } from "@/api/orderList";
 import {
   getAllOrders,
   InsertOperationRecord,
-  cancelOrderNew
+  cancelOrderNew,
+  copyCartItem
 } from "@/api/orderListASP";
 import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
@@ -606,26 +620,76 @@ export default {
         cid: Cookies.get("cid"),
         orderNo: pushOrderNum
       };
-      this.$confirm("确定取消订单？", "提示", {
+      this.$confirm("确定作废订单？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning"
       })
         .then(() => {
           //cancelOrder(url, data).then(res => {
-          cancelOrderNew(data).then(res => {
-            this.$alert("删除成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
+          cancelOrderNew(data)
+            .then(res => {
+              if (pushOrderNum.slice(0, 1) == "X") {
+                this.$confirm(
+                  "作废成功，是否将该订单原购物车数据复制到购物车中？",
+                  "提示",
+                  {
+                    confirmButtonText: "是",
+                    cancelButtonText: "否",
+                    type: "warning"
+                  }
+                )
+                  .then(() => {
+                    var data3 = {
+                      orderNo: pushOrderNum
+                    };
+                    copyCartItem(data3).then(res => {
+                      this.$alert("复制成功，请到购物车中查看", "提示", {
+                        confirmButtonText: "确定",
+                        type: "success"
+                      });
+                    });
+                  })
+                  .catch(() => {});
+              } else {
+                this.$alert("删除成功", "提示", {
+                  confirmButtonText: "确定",
+                  type: "success"
+                });
+              }
+              this.refresh();
+              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+            })
+            .catch(res => {
+              this.$alert("删除失败，订单状态错误", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
             });
-            this.refresh();
-            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-          });
           //预留接口-删除订单
         })
         .catch(() => {
           console.log("还没删");
         });
+    },
+    copyCart(orderNo) {
+      this.$confirm("是否将该订单原购物车数据复制到购物车中？", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning"
+      })
+        .then(() => {
+          var data = {
+            orderNo: orderNo
+          };
+          copyCartItem(data).then(res => {
+            this.$alert("复制成功，请到购物车中查看", "提示", {
+              confirmButtonText: "确定",
+              type: "success"
+            });
+          });
+        })
+        .catch(() => {});
     },
     refreshPay(item) {
       var url = "/order/getResidemoney.do";
