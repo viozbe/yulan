@@ -1,17 +1,17 @@
 <template>
-  <el-submenu v-if="menuTreeItem.children && menuTreeItem.children.length >= 1" :index="menuTreeItem.MenuIndex">
+  <el-submenu v-if="menuTreeItem.children && menuTreeItem.children.length >= 1" :index="menuTreeItem.MENU_INDEX">
     <template slot="title">
-      <i class="iconfont icon-color" v-html="menuTreeItem.IconClass">{{menuTreeItem.IconClass}}</i>
-      <span>{{menuTreeItem.MenuName}}</span>
+      <i v-if="menuTreeItem.ICON_CLASS!=''" class="iconfont icon-color" v-html="menuTreeItem.ICON_CLASS">{{menuTreeItem.ICON_CLASS}}</i>
+      <span>{{menuTreeItem.MENU_NAME}}</span>
     </template>
     <el-menu-item-group>
-      <menuTree v-for="item in menuTreeItem.children" :key="item.SystemMenuID" :menuTreeItem="item"></menuTree>
+      <menuTree v-for="item in menuTreeItem.children" :key="item.SYSTEMMENU_ID" :menuTreeItem="item"></menuTree>
     </el-menu-item-group>
   </el-submenu>
   <router-link :to="menuTreeItem.MenuLink" v-else tag="div">
-    <el-menu-item :index="menuTreeItem.MenuIndex">
-      <i v-if="menuTreeItem.IconClass!=''" class="iconfont icon-color" v-html="menuTreeItem.IconClass">{{menuTreeItem.IconClass}}</i>
-      <span>{{menuTreeItem.MenuName}}</span>
+    <el-menu-item :index="menuTreeItem.MENU_INDEX">
+      <i v-if="menuTreeItem.ICON_CLASS!=''" class="iconfont icon-color" v-html="menuTreeItem.ICON_CLASS">{{menuTreeItem.ICON_CLASS}}</i>
+      <span>{{menuTreeItem.MENU_NAME}}</span>
     </el-menu-item>
   </router-link>
 </template>

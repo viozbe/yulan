@@ -1,78 +1,79 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link rel="icon" type="image/x-icon" href="./static/base/img/headerLogo.jpg" />
-    <link rel="stylesheet" href="./static/base/css/tip.css">
-    <title>玉兰B2B订单系统</title>
-  </head>
-  <body>
-    <div id="tip">
-      <div id="tip_div">
-        <img src="./static/base/img/login_logo.JPG" width="280" alt="玉兰B2B"/>
-        <br>
-        <div id="tip_bg">
-          <p id="tip_word">
-            亲爱的用户您好，您使用的IE浏览器版本过低，请自行下载IE最新版本或者使用其它浏览器
-          </p>
-        </div>
-        <span id="tip_span">本系统支持IE10+，以及其它主流浏览器</span>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- 不要缓存 -->
+  <meta http-equiv="pragram" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="expires" content="0">
+  <link rel="icon" type="image/x-icon" href="./static/base/img/headerLogo.jpg" />
+  <link rel="stylesheet" href="./static/base/css/tip.css">
+  <title>玉兰B2B订单系统</title>
+</head>
+
+<body>
+  <div id="tip">
+    <div id="tip_div">
+      <img src="./static/base/img/login_logo.JPG" width="280" alt="玉兰B2B" />
+      <br>
+      <div id="tip_bg">
+        <p id="tip_word">
+          亲爱的用户您好，您使用的IE浏览器版本过低，请自行下载IE最新版本或者使用其它浏览器
+        </p>
       </div>
+      <span id="tip_span">本系统支持IE10+，以及其它主流浏览器</span>
     </div>
-    <div id="app">
-    </div>
-    <!-- built files will be auto injected -->
-    <script>
-      function browserType() {
-        var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
-        var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器 
-        // var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否IE浏览器 
-        var isIE=window.ActiveXObject || "ActiveXObject" in window
-        // var isEdge = userAgent.indexOf("Windows NT 6.1; Trident/7.0;") > -1 && !isIE; //判断是否IE的Edge浏览器 
-        var isEdge = userAgent.indexOf("Edge") > -1; //判断是否IE的Edge浏览器
-        var isFF = userAgent.indexOf("Firefox") > -1; //判断是否Firefox浏览器 
-        var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; //判断是否Safari浏览器 
-        var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1&&!isEdge; //判断Chrome浏览器 
+  </div>
+  <div id="app">
+  </div>
+  <!-- built files will be auto injected -->
+  <script>
+    function browserType() {
+      var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
+      var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器 
+      // var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否IE浏览器 
+      var isIE = window.ActiveXObject || "ActiveXObject" in window
+      // var isEdge = userAgent.indexOf("Windows NT 6.1; Trident/7.0;") > -1 && !isIE; //判断是否IE的Edge浏览器 
+      var isEdge = userAgent.indexOf("Edge") > -1; //判断是否IE的Edge浏览器
+      var isFF = userAgent.indexOf("Firefox") > -1; //判断是否Firefox浏览器 
+      var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; //判断是否Safari浏览器 
+      var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && !isEdge; //判断Chrome浏览器 
 
-        if (isIE)  { 
-            var reIE = new RegExp("MSIE (\\d+\\.\\d+);"); 
-            reIE.test(userAgent); 
-            var fIEVersion = parseFloat(RegExp["$1"]); 
-            if(userAgent.indexOf('MSIE 6.0')!=-1)
-            { return "IE6";}
-            else if(fIEVersion == 7) 
-            { return "IE7";} 
-            else if(fIEVersion == 8) 
-            { return "IE8";} 
-            else if(fIEVersion == 9) 
-            { return "IE9";} 
-            else if(fIEVersion == 10) 
-            { return "IE10";} 
-            else if(userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/))
-            { return "IE11";} 
-            else{ return "IE0"}//IE版本过低
-        }//isIE end 
+      if (isIE) {
+        var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+        reIE.test(userAgent);
+        var fIEVersion = parseFloat(RegExp["$1"]);
+        if (userAgent.indexOf('MSIE 6.0') != -1) { return "IE6"; }
+        else if (fIEVersion == 7) { return "IE7"; }
+        else if (fIEVersion == 8) { return "IE8"; }
+        else if (fIEVersion == 9) { return "IE9"; }
+        else if (fIEVersion == 10) { return "IE10"; }
+        else if (userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) { return "IE11"; }
+        else { return "IE0" }//IE版本过低
+      }//isIE end 
 
-        if (isFF) { return "FF";} 
-        if (isOpera) { return "Opera";} 
-        if (isSafari) { return "Safari";} 
-        if (isChrome) { return "Chrome";} 
-        if (isEdge) { return "Edge";} 
+      if (isFF) { return "FF"; }
+      if (isOpera) { return "Opera"; }
+      if (isSafari) { return "Safari"; }
+      if (isChrome) { return "Chrome"; }
+      if (isEdge) { return "Edge"; }
+    }
+    window.onload = function () {
+      var result = browserType()
+      if (result === 'IE6' || result === 'IE7' || result === 'IE8' || result === 'IE9' || result === 'IE0') {
+        document.getElementById('tip').style.display = 'block'
+        document.getElementById('app').style.display = 'none'
+        document.getElementById('app').innerHTML = ''
       }
-      window.onload=function(){
-        var result = browserType()
-        if(result==='IE6'||result==='IE7'||result==='IE8'||result==='IE9'||result==='IE0'){
-          document.getElementById('tip').style.display = 'block'
-          document.getElementById('app').style.display = 'none'
-          document.getElementById('app').innerHTML = ''
-        }
-        else{
-          document.getElementById('tip').innerHTML = ''
-        }
+      else {
+        document.getElementById('tip').innerHTML = ''
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
+
 </html>

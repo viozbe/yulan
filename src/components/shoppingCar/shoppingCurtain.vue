@@ -233,6 +233,28 @@ export default {
             }
           }
         }
+        //总价赋值
+        for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
+          var totalPrice = 0;
+          for (
+            let k = 0;
+            k < theData[i].curtainCartItems[j].curtainLists.length;
+            k++
+          ) {
+            for (
+              let l = 0;
+              l <
+              theData[i].curtainCartItems[j].curtainLists[k].curtainCommodities
+                .length;
+              l++
+            ) {
+              totalPrice +=
+                theData[i].curtainCartItems[j].curtainLists[k]
+                  .curtainCommodities[l].price;
+            }
+          }
+          theData[i].curtainCartItems[j].price = totalPrice;
+        }
       }
       //获取中文活动名
       let pIdArr = [];

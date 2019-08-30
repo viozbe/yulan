@@ -20,7 +20,7 @@
           <ShoppingCurtain :curtainData="curtainData"></ShoppingCurtain>
         </el-tab-pane>
         <el-tab-pane label="软装" name="softSuit">
-          <ShoppingSoftSuit></ShoppingSoftSuit>
+          <ShoppingSoftSuit :softsuitData="softsuitData"></ShoppingSoftSuit>
         </el-tab-pane>
       </el-tabs>
     </el-card>
