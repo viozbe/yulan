@@ -661,7 +661,7 @@ export default {
               this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
             })
             .catch(res => {
-              this.$alert("删除失败，订单状态错误", "提示", {
+              this.$alert("删除失败," + res.msg + ",请刷新订单", "提示", {
                 confirmButtonText: "确定",
                 type: "success"
               });

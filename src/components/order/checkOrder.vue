@@ -343,7 +343,8 @@ import {
   orderSettlement,
   normalOrderSettlement,
   InsertOperationRecord,
-  getUseRecord
+  getUseRecord,
+  getCustomerInfo
 } from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
@@ -1348,7 +1349,9 @@ export default {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId")
       };
-      querycharge(url, data).then(res => {
+      
+      //querycharge(url, data).then(res => {
+      getCustomerInfo(data).then(res => {
         console.log(res);
         this.chargeData = res.data;
       });
