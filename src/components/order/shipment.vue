@@ -28,27 +28,27 @@
         </span>
       </div>
       <el-table :data="tableData" style="width: 100%" :row-class-name="tableRowClassName">
-        <el-table-column prop="saleNo" label="提货单号" align="center"></el-table-column>
-        <el-table-column prop="qtyDeliver" label="数量" align="center"></el-table-column>
-        <el-table-column prop="batchNo" label="批号" align="center"></el-table-column>
+        <el-table-column prop="SALE_NO" label="提货单号" align="center"></el-table-column>
+        <el-table-column prop="QTY_DELIVER" label="数量" align="center"></el-table-column>
+        <el-table-column prop="BATCH_NO" label="批号" align="center"></el-table-column>
         <el-table-column align="center" label="出货情况">
           <template slot-scope="scope">
-            <span style="font-size:14px; color:black;" v-if="scope.row.dateOutStock==''">待发货</span>
+            <span style="font-size:14px; color:black;" v-if="scope.row.DATE_OUT_STOCK==''||scope.row.DATE_OUT_STOCK=='9999/12/31 00:00:00'">待发货</span>
             <span style="font-size:14px; color:black;" v-else>已发货</span>
           </template>
         </el-table-column>
         <el-table-column label="发货日期" align="center">
           <template slot-scope="scope1">
-            <span>{{scope1.row.dateOutStock | datatrans}}</span>
+            <span>{{scope1.row.DATE_OUT_STOCK | datatrans}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="freight" label="加收物流费" align="center"></el-table-column>
-        <el-table-column prop="transcompany" label="物流公司" align="center"></el-table-column>
-        <el-table-column prop="transId" label="物流单号" align="center"></el-table-column>
+        <el-table-column prop="FREIGHT" label="加收物流费" align="center"></el-table-column>
+        <el-table-column prop="TRANSCOMPANY" label="物流公司" align="center"></el-table-column>
+        <el-table-column prop="TRANS_ID" label="物流单号" align="center"></el-table-column>
         <el-table-column align="center" label="物流查看">
           <template slot-scope="scope">
-            <a :href="kuaidi100" target="_blank" @click="searchWL(scope.row.transId)">
-              <el-button :disabled="scope.row.transId===''" type="danger" size="small">查看物流</el-button>
+            <a :href="kuaidi100" target="_blank" @click="searchWL(scope.row.TRANS_ID)">
+              <el-button :disabled="scope.row.TRANS_ID===''" type="danger" size="small">查看物流</el-button>
             </a>
           </template>
         </el-table-column>
@@ -60,6 +60,7 @@
 <script>
 import Axios from "axios";
 import { getShipment } from "@/api/orderList";
+import { getPackDetailInfo } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 export default {
@@ -77,6 +78,7 @@ export default {
   },
   filters: {
     datatrans(value) {
+      if(value == '9999/12/31 00:00:00') return '';
       //时间戳转化大法
       let date = new Date(value);
       let y = date.getFullYear();
@@ -110,16 +112,21 @@ export default {
       this.dingdanhao = this.$route.params.orderId;
       this.saleNo = this.$route.params.itemNo;
       this.lineNo = this.$route.params.lineNo;
-
-      Axios.post("/packDetail/getPackDetailAppoint.do", {
-        itemNo: this.saleNo,
-        orderId: this.dingdanhao,
-        lineNo: this.lineNo
-      })
+      var data = {
+        orderNo: this.dingdanhao,
+        lineNo: this.lineNo,
+        itemNo: this.saleNo
+      };
+      // Axios.post("/packDetail/getPackDetailAppoint.do", {
+      //   itemNo: this.saleNo,
+      //   orderId: this.dingdanhao,
+      //   lineNo: this.lineNo
+      // })
+      getPackDetailInfo(data)
         .then(res => {
           console.log(res);
-          this.tableData = res.data.packDetails;
-          this.zongshuliang = res.data.allCount;
+          this.tableData = res.data[0].packDetails;
+          this.zongshuliang = res.data[0].allCount;
 
           //this.daifashuliang=res.allCount-res.packDetails[0].qtyDeliver
         })

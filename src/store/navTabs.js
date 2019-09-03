@@ -21,7 +21,7 @@ const state = {
             MENU_TEXT: '产品',
             MENU_LINK: 'shops',
             ICON_CLASS: '&#xe624;',
-            MENU_TYPE:'menu',
+            MENU_TYPE: 'menu',
             children: [
                 {
                     SYSTEMMENU_ID: 101,
@@ -30,7 +30,7 @@ const state = {
                     MENU_TEXT: '墙纸',
                     MENU_LINK: 'shops/wallPaper',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
                 {
                     SYSTEMMENU_ID: 102,
@@ -39,7 +39,7 @@ const state = {
                     MENU_TEXT: '窗帘',
                     MENU_LINK: 'shops/curtain',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
                 {
                     SYSTEMMENU_ID: 103,
@@ -48,7 +48,7 @@ const state = {
                     MENU_TEXT: '软装',
                     MENU_LINK: 'shops/softSuit',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
             ]
         },
@@ -59,7 +59,7 @@ const state = {
             MENU_TEXT: '购物车',
             MENU_LINK: 'shoppingCar',
             ICON_CLASS: '&#xf0179;',
-            MENU_TYPE:'menu',
+            MENU_TYPE: 'menu',
             children: [
                 {
                     SYSTEMMENU_ID: 201,
@@ -68,7 +68,7 @@ const state = {
                     MENU_TEXT: '购物车',
                     MENU_LINK: 'shoppingCar/shopping?wallPaper',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
                 {
                     SYSTEMMENU_ID: 202,
@@ -77,7 +77,7 @@ const state = {
                     MENU_TEXT: '购物车',
                     MENU_LINK: 'shoppingCar/shopping?curtain',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
                 {
                     SYSTEMMENU_ID: 203,
@@ -86,7 +86,7 @@ const state = {
                     MENU_TEXT: '购物车',
                     MENU_LINK: 'shoppingCar/shopping?softSuit',
                     ICON_CLASS: '',
-                    MENU_TYPE:'menu',
+                    MENU_TYPE: 'menu',
                 },
             ]
         },
@@ -97,7 +97,7 @@ const state = {
             MENU_TEXT: '我的订单',
             MENU_LINK: 'order/myOrder',
             ICON_CLASS: '&#xe62b;',
-            MENU_TYPE:'menu',
+            MENU_TYPE: 'menu',
         },
         {
             SYSTEMMENU_ID: 4,
@@ -106,7 +106,7 @@ const state = {
             MENU_TEXT: '对账单',
             MENU_LINK: 'statement',
             ICON_CLASS: 'el-icon-goods',
-            MENU_TYPE:'menu',
+            MENU_TYPE: 'menu',
         },
         {
             SYSTEMMENU_ID: 5,
@@ -115,7 +115,7 @@ const state = {
             MENU_TEXT: '我的优惠券',
             MENU_LINK: 'myZone/myCoupon',
             ICON_CLASS: '',
-            MENU_TYPE:'function',
+            MENU_TYPE: 'function',
         }
     ]
 }
@@ -147,7 +147,12 @@ const mutations = {
             let isClose;
             if (state.closeToArray.includes(index)) isClose = false;
             else isClose = true;
-            //let tabName = state.menuTreeListFlatten.filter(item => item.MENU_LINK == oldIndex)[0].MENU_TEXT;
+            let tabName = '';
+            // var mapTab = state.menuTreeListFlatten.filter(item => item.MENU_LINK == oldIndex);
+            // if (mapTab.length > 0)
+            //     tabName = mapTab[0].MENU_TEXT;
+            // else
+            //     tabName = tabsName(index);
             state.tabList.push({
                 label: tabsName(index),     //选项卡标题
                 name: index,                //唯一标识id，指向组件

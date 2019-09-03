@@ -1244,7 +1244,7 @@ export default {
             } else {
               this.$alert(
                 "余额不足，当前订单还需充值" +
-                  (this.allSpend - this.Initial_balance) +
+                  (this.allSpend - this.Initial_balance).toFixed(2) +
                   "元才能提交",
                 "提示",
                 {
@@ -1321,7 +1321,7 @@ export default {
             } else {
               this.$alert(
                 "余额不足，当前订单还需充值" +
-                  (this.allSpend - this.Initial_balance) +
+                  (this.allSpend - this.Initial_balance).toFixed(2) +
                   "元才能提交",
                 "提示",
                 {
