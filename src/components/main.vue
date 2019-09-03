@@ -13,7 +13,7 @@
             @select="addTab"
             :collapse="asideStatus"
           >
-            <!-- <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item"></menuTree> -->
+            <!-- <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item"/> -->
             <el-submenu index="shops">
               <template slot="title">
                 <i class="iconfont icon-color">&#xe624;</i>
@@ -165,6 +165,7 @@
           </ul>
           <ul class="r">
             <li style="height:50px;">
+              <!-- v-if = "isContainAttr('shoppingCar')"  -->
               <el-dropdown trigger="hover" style="margin:0;">
                 <span class="el-dropdown-link mr10">
                   <i class="iconfont ml10" style="margin-right:3px;">&#xf0179;</i>
@@ -172,16 +173,19 @@
                   <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown" style="min-width: 120px;">
+                  <!-- v-if = "isContainAttr('shoppingCar/shopping?wallPaper')"   -->
                   <router-link to="/shoppingCar/shopping?wallPaper" tag="li">
                     <el-dropdown-item @click.native="addTab('shoppingCar/shopping?wallPaper')">
                       <span>墙纸配套类</span>
                     </el-dropdown-item>
                   </router-link>
+                  <!-- v-if = "isContainAttr('shoppingCar/shopping?curtain')"   -->
                   <router-link to="/shoppingCar/shopping?curtain" tag="li">
                     <el-dropdown-item @click.native="addTab('shoppingCar/shopping?curtain')">
                       <span>窗帘</span>
                     </el-dropdown-item>
                   </router-link>
+                  <!--v-if = "isContainAttr('shoppingCar/shopping?softSuit')"   -->
                   <router-link to="/shoppingCar/shopping?softSuit" tag="li">
                     <el-dropdown-item @click.native="addTab('shoppingCar/shopping?softSuit')">
                       <span>软装</span>
@@ -190,6 +194,7 @@
                 </el-dropdown-menu>
               </el-dropdown>
             </li>
+            <!--v-if = "isContainAttr('order/myOrder')"  -->
             <router-link to="/order/myOrder" tag="li">
               <li @click="addTab('order/myOrder')">
                 <span class="ml10 mr10">我的订单</span>
@@ -202,9 +207,10 @@
                   <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown" style="min-width: 150px;">
-                  <el-dropdown-item>历年经销设计书</el-dropdown-item>
+                  <!-- <el-dropdown-item>历年经销设计书</el-dropdown-item>
                   <el-dropdown-item>修改登录密码</el-dropdown-item>
-                  <el-dropdown-item>修改对账密码</el-dropdown-item>
+                  <el-dropdown-item>修改对账密码</el-dropdown-item> -->
+                  <!--v-if = "isContainAttr('myZone/myCoupon')"  -->
                   <router-link to="/myZone/myCoupon" tag="li">
                     <el-dropdown-item @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
                   </router-link>
@@ -320,7 +326,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("navTabs", ["addTab"]),
+    ...mapMutations("navTabs", ["addTab","setMenuTreeList"]),
     ...mapMutations("badge", ["changeBadge"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     /*
@@ -476,10 +482,18 @@ export default {
       this.$router.push({
         path: "/login"
       });
+    },
+    //获得菜单数组并传入store
+    getMenuTree(){
+       this.setMenuTreeList();
+    },
+    isContainAttr(attr)
+    {
+        return this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr).length > 0;
     }
   },
   computed: {
-    ...mapState("navTabs", ["tabList", "menuTreeList"]),
+    ...mapState("navTabs", ["tabList", "menuTreeList","menuTreeListFlatten"]),
     getRefund() {
       return this.$store.getters["badge/getRefund"];
     },
@@ -562,6 +576,7 @@ export default {
   created() {
     this.userMoney();
     this.getPath();
+    this.getMenuTree();
     this.addTab(this.defaultUrl);
     this.addBadgeIcon();
     this.PaintingIcon();
@@ -662,8 +677,8 @@ export default {
   text-align: left;
 }
 .el-menu i {
-  font-size: 20px;
-  margin: 0 20px;
+  font-size: 18px;
+  margin: 0 10px;
 }
 .icon-color {
   color: #303133;

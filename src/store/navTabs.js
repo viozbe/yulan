@@ -12,38 +12,43 @@ const state = {
     //标签数组
     tabList: [],
     //导航数组，等权限控制做好通过后台读取
+    menuTreeListFlatten: [],
     menuTreeList: [
         {
             SYSTEMMENU_ID: 1,
             PSYSTEMMENU_ID: 0,
             MENU_NAME: '产品',
-            MENU_LINK: '',
-            MENU_INDEX: 'shops',
+            MENU_TEXT: '产品',
+            MENU_LINK: 'shops',
             ICON_CLASS: '&#xe624;',
+            MENU_TYPE:'menu',
             children: [
                 {
                     SYSTEMMENU_ID: 101,
                     PSYSTEMMENU_ID: 1,
                     MENU_NAME: '墙纸配套类',
-                    MENU_LINK: '/shops/wallPaper',
-                    MENU_INDEX: 'shops/wallPaper',
+                    MENU_TEXT: '墙纸',
+                    MENU_LINK: 'shops/wallPaper',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
                 {
                     SYSTEMMENU_ID: 102,
                     PSYSTEMMENU_ID: 1,
                     MENU_NAME: '窗帘',
-                    MENU_LINK: '/shops/curtain',
-                    MENU_INDEX: 'shops/curtain',
+                    MENU_TEXT: '窗帘',
+                    MENU_LINK: 'shops/curtain',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
                 {
                     SYSTEMMENU_ID: 103,
                     PSYSTEMMENU_ID: 1,
                     MENU_NAME: '软装',
-                    MENU_LINK: '/shops/softSuit',
-                    MENU_INDEX: 'shops/softSuit',
+                    MENU_TEXT: '软装',
+                    MENU_LINK: 'shops/softSuit',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
             ]
         },
@@ -51,33 +56,37 @@ const state = {
             SYSTEMMENU_ID: 2,
             PSYSTEMMENU_ID: 0,
             MENU_NAME: '购物车',
-            MENU_LINK: '',
-            MENU_INDEX: 'shoppingCar',
+            MENU_TEXT: '购物车',
+            MENU_LINK: 'shoppingCar',
             ICON_CLASS: '&#xf0179;',
+            MENU_TYPE:'menu',
             children: [
                 {
                     SYSTEMMENU_ID: 201,
                     PSYSTEMMENU_ID: 2,
                     MENU_NAME: '墙纸配套类',
-                    MENU_LINK: '/shoppingCar/shopping?wallPaper',
-                    MENU_INDEX: 'shoppingCar/shopping?wallPaper',
+                    MENU_TEXT: '购物车',
+                    MENU_LINK: 'shoppingCar/shopping?wallPaper',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
                 {
                     SYSTEMMENU_ID: 202,
                     PSYSTEMMENU_ID: 2,
                     MENU_NAME: '窗帘',
-                    MENU_LINK: '/shoppingCar/shopping?curtain',
-                    MENU_INDEX: 'shoppingCar/shopping?curtain',
+                    MENU_TEXT: '购物车',
+                    MENU_LINK: 'shoppingCar/shopping?curtain',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
                 {
                     SYSTEMMENU_ID: 203,
                     PSYSTEMMENU_ID: 2,
                     MENU_NAME: '软装',
-                    MENU_LINK: '/shoppingCar/shopping?softSuit',
-                    MENU_INDEX: 'shoppingCar/shopping?softSuit',
+                    MENU_TEXT: '购物车',
+                    MENU_LINK: 'shoppingCar/shopping?softSuit',
                     ICON_CLASS: '',
+                    MENU_TYPE:'menu',
                 },
             ]
         },
@@ -85,10 +94,29 @@ const state = {
             SYSTEMMENU_ID: 3,
             PSYSTEMMENU_ID: 0,
             MENU_NAME: '我的订单',
-            MENU_LINK: '/order/myOrder',
-            MENU_INDEX: 'order/myOrder',
+            MENU_TEXT: '我的订单',
+            MENU_LINK: 'order/myOrder',
             ICON_CLASS: '&#xe62b;',
+            MENU_TYPE:'menu',
         },
+        {
+            SYSTEMMENU_ID: 4,
+            PSYSTEMMENU_ID: 0,
+            MENU_NAME: '对账单',
+            MENU_TEXT: '对账单',
+            MENU_LINK: 'statement',
+            ICON_CLASS: 'el-icon-goods',
+            MENU_TYPE:'menu',
+        },
+        {
+            SYSTEMMENU_ID: 5,
+            PSYSTEMMENU_ID: 0,
+            MENU_NAME: '我的优惠券',
+            MENU_TEXT: '我的优惠券',
+            MENU_LINK: 'myZone/myCoupon',
+            ICON_CLASS: '',
+            MENU_TYPE:'function',
+        }
     ]
 }
 
@@ -119,6 +147,7 @@ const mutations = {
             let isClose;
             if (state.closeToArray.includes(index)) isClose = false;
             else isClose = true;
+            //let tabName = state.menuTreeListFlatten.filter(item => item.MENU_LINK == oldIndex)[0].MENU_TEXT;
             state.tabList.push({
                 label: tabsName(index),     //选项卡标题
                 name: index,                //唯一标识id，指向组件
@@ -188,8 +217,28 @@ const mutations = {
     */
     emptyTabList(state) {
         state.tabList = [];
+    },
+    setMenuTreeList(state, data) {
+        //data菜单树
+        state.menuTreeListFlatten = arrayChildrenFlatten(state.menuTreeList, []);
     }
 };
+/*
+    *多维数组数组扁平化
+    */
+function arrayChildrenFlatten(array, result) {
+    for (var i = 0; i < array.length; i++) {
+        var item = array[i];
+        if (item.children && item.children.length > 0) {
+            result.push(item);
+            result = arrayChildrenFlatten(item.children, result);
+        }
+        else {
+            result.push(item);
+        }
+    }
+    return result;
+}
 
 const getters = {
     //获取标签数组

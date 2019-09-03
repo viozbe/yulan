@@ -156,7 +156,7 @@ export function getItemById(data, config = {}) {
         return Promise.reject(err);
     })
 }
-//查询
+//根据客户id查询客户
 export function getCustomerInfo(data, config = {}) {
     return post('/CUSTOMER/getCustomerInfo', data, config).then((res) => {
         if (res.code === 0 || res.success) {//放到外面判断，有些返回不会返回是否成功，直接返回数据
