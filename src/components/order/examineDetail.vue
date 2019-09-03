@@ -95,7 +95,7 @@
         </span>
         <span v-if="ruleForm.DATE_DEAL" class="timeLeft">
           处理：
-          <span class="timeRight">{{ruleForm.DATE_DEAL}}</span>
+          <span class="timeRight">{{ruleForm.DATE_DEAL | datatrans}}</span>
         </span>
         <span v-if="ruleForm.USER_NO" class="timeLeft">
           处理人：
@@ -182,6 +182,24 @@ export default {
   created: function() {
     this.getDetail();
     this.orderNumber = Cookies.get("ORDER_NO");
+  },
+  filters: {
+    datatrans(value) {
+      //时间戳转化大法
+      let date = new Date(value);
+      let y = date.getFullYear();
+      let MM = date.getMonth() + 1;
+      MM = MM < 10 ? "0" + MM : MM;
+      let d = date.getDate();
+      d = d < 10 ? "0" + d : d;
+      let h = date.getHours();
+      h = h < 10 ? "0" + h : h;
+      let m = date.getMinutes();
+      m = m < 10 ? "0" + m : m;
+      let s = date.getSeconds();
+      s = s < 10 ? "0" + s : s;
+      return y + "-" + MM + "-" + d + " " + h + ':' + m + ':' + s;
+    }
   },
   methods: {
     //关闭页面
