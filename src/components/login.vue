@@ -84,6 +84,7 @@ export default {
                 console.log(res);
                 let companyId;
                 Cookies.set('cid',cid);
+                Cookies.set('userInfo',res.data);
                 Cookies.set('isManager',res.data.isManager);
                 Cookies.set('realName',res.data.realName);
                 companyId = (res.data.companyId === null)?'null':res.data.companyId

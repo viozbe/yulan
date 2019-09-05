@@ -875,7 +875,7 @@ export default {
                     WBH: (_outsourcingBoxWidth === null)?'0':_outsourcingBoxWidth.toString(),
                     multiple: _headerData.drape.toString(),
                     parentItemNo: _headerData.modelNumber,
-                    itemNO: this.data[index].item.itemNo,    
+                    itemNO: this.itemNo,    
                     itemType: this.data[index].itemType,
                     fixType: _fixType
                 };
